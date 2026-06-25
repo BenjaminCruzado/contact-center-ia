@@ -1,8 +1,8 @@
 # Contact Center automatizado con IA
 
 Base operativa del backend para el prototipo académico de Contact Center. Este
-Sprint 07 configura FastAPI y Docker; todavía no incorpora RAG, LLM, STT, TTS
-ni telefonía.
+proyecto ya incorpora el flujo mínimo del Sprint 08 para procesar PDFs en
+memoria; todavía no incorpora RAG, LLM, STT, TTS ni telefonía.
 
 ## Requisitos
 
@@ -33,6 +33,19 @@ ni telefonía.
 
 La documentación interactiva queda disponible en
 `http://localhost:8000/docs`.
+
+## Procesar un PDF
+
+```powershell
+curl.exe -X POST `
+  "http://localhost:8000/documentos/subir?chunk_size=500&chunk_overlap=50" `
+  -H "accept: application/json" `
+  -H "Content-Type: multipart/form-data" `
+  -F "file=@ruta/al/documento.pdf;type=application/pdf"
+```
+
+La respuesta contiene el texto extraído y segmentado en memoria. Los PDFs
+escaneados sin capa de texto requieren OCR y no forman parte del Sprint 08.
 
 ## Operación
 
@@ -68,4 +81,4 @@ app/
 ```
 
 Las evidencias de validación se organizan en `evidencia/sprint-07/`.
-
+Las evidencias de ingesta documental se organizan en `evidencia/sprint-08/`.

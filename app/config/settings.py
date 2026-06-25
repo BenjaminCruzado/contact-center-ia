@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = Field(default="Contact Center API", min_length=1)
-    app_version: str = Field(default="0.1.0", min_length=1)
+    app_version: str = Field(default="0.2.0", min_length=1)
     app_env: Literal["development", "testing", "production"] = "development"
     app_debug: bool = False
     app_host: str = "0.0.0.0"
@@ -27,4 +27,3 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
-

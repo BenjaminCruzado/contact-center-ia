@@ -1,0 +1,18 @@
+Sprint 08 - Extracción y chunking de PDF
+Fecha: 2026-06-24
+
+NAME                 IMAGE            SERVICE   STATUS                    PORTS
+contact-center-api   callcenter-api   api       Up (healthy)              0.0.0.0:8000->8000/tcp
+
+contact-center-api | INFO: Iniciando extracción PDF: documento_prueba.pdf
+contact-center-api | INFO: Página 1/1 extraída: 2351 caracteres
+contact-center-api | INFO: Extracción completada: documento=documento_prueba.pdf páginas=1 páginas_con_texto=1 caracteres=2351
+contact-center-api | INFO: Documento procesado en memoria: documento=documento_prueba.pdf chunks=6 chunk_size=500 overlap=50
+contact-center-api | INFO: Chunk registrado: id=documento-prueba-0001 índice=0 caracteres=499 rango=0-499
+contact-center-api | INFO: Chunk registrado: id=documento-prueba-0002 índice=1 caracteres=499 rango=441-940
+contact-center-api | INFO: Chunk registrado: id=documento-prueba-0003 índice=2 caracteres=495 rango=890-1385
+contact-center-api | INFO: Chunk registrado: id=documento-prueba-0004 índice=3 caracteres=495 rango=1333-1828
+contact-center-api | INFO: Chunk registrado: id=documento-prueba-0005 índice=4 caracteres=495 rango=1778-2273
+contact-center-api | INFO: Chunk registrado: id=documento-prueba-0006 índice=5 caracteres=130 rango=2221-2351
+contact-center-api | INFO: POST /documentos/subir?chunk_size=500&chunk_overlap=50 HTTP/1.1 200 OK
+

@@ -1,0 +1,59 @@
+{
+  "document": "documento_prueba.pdf",
+  "pages": 1,
+  "extracted_characters": 2351,
+  "chunk_size": 500,
+  "chunk_overlap": 50,
+  "total_chunks": 6,
+  "chunks": [
+    {
+      "id": "documento-prueba-0001",
+      "index": 0,
+      "content": "El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y",
+      "character_count": 499,
+      "start_character": 0,
+      "end_character": 499
+    },
+    {
+      "id": "documento-prueba-0002",
+      "index": 1,
+      "content": "documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para",
+      "character_count": 499,
+      "start_character": 441,
+      "end_character": 940
+    },
+    {
+      "id": "documento-prueba-0003",
+      "index": 2,
+      "content": "y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de",
+      "character_count": 495,
+      "start_character": 890,
+      "end_character": 1385
+    },
+    {
+      "id": "documento-prueba-0004",
+      "index": 3,
+      "content": "conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF,",
+      "character_count": 495,
+      "start_character": 1333,
+      "end_character": 1828
+    },
+    {
+      "id": "documento-prueba-0005",
+      "index": 4,
+      "content": "Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el",
+      "character_count": 495,
+      "start_character": 1778,
+      "end_character": 2273
+    },
+    {
+      "id": "documento-prueba-0006",
+      "index": 5,
+      "content": "extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas.",
+      "character_count": 130,
+      "start_character": 2221,
+      "end_character": 2351
+    }
+  ]
+}
+

@@ -1,0 +1,18 @@
+Sprint 08 - Pruebas automatizadas
+Fecha: 2026-06-24
+
+Comando:
+docker compose exec -T api pytest -q
+
+Resultado:
+............                                                             [100%]
+12 passed in 0.52s
+
+Validaciones adicionales:
+- Docker healthcheck: healthy
+- Compilación Python (compileall): OK
+- GET /health: HTTP 200
+- GET /version: HTTP 200, versión 0.2.0
+- POST /documentos/subir: HTTP 200
+- Target Docker de producción: compilado correctamente
+
