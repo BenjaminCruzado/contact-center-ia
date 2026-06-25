@@ -7,10 +7,15 @@ contact-center-api   callcenter-api   "uvicorn app.main:ap…"   api       Up (h
 contact-center-api  | INFO:     Will watch for changes in these directories: ['/app']
 contact-center-api  | INFO:     Uvicorn running on http://0.0.0.0:8000
 contact-center-api  | INFO:     Started reloader process [1] using WatchFiles
-contact-center-api  | INFO:     Started server process [8]
+contact-center-api  | INFO:     Started server process [9]
 contact-center-api  | INFO:     Waiting for application startup.
 contact-center-api  | INFO:     Application startup complete.
 contact-center-api  | INFO:     "GET /health HTTP/1.1" 200 OK
 contact-center-api  | INFO:     "GET /healthcheck HTTP/1.1" 200 OK
 contact-center-api  | INFO:     "GET /version HTTP/1.1" 200 OK
 
+Validación repetida después de publicar la rama sprint-7:
+- Contenedor: contact-center-api
+- Estado: Up (healthy)
+- Puerto: 0.0.0.0:8000->8000/tcp
+- Target de producción: compilado correctamente
