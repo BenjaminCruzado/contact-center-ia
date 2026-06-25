@@ -1,0 +1,17 @@
+{
+  "status": "active",
+  "collection": "contact-center-documents",
+  "records": 6,
+  "index": {
+    "type": "hnsw",
+    "space": "cosine",
+    "ef_construction": 100,
+    "ef_search": 100,
+    "max_neighbors": 16
+  },
+  "persistence": {
+    "container_path": "/data",
+    "verified_after_restart": true
+  }
+}
+

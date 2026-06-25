@@ -1,0 +1,18 @@
+Sprint 09 - ChromaDB
+Fecha: 2026-06-24
+
+Servicio: contact-center-chroma
+Imagen: chromadb/chroma:1.5.9
+Estado: healthy
+Puerto local: 8001
+Ruta persistente del contenedor: /data
+Colección: contact-center-documents
+Registros: 6
+Índice: HNSW
+Distancia: cosine
+
+Prueba de persistencia:
+- Contenedor ChromaDB reiniciado.
+- Heartbeat posterior: exitoso.
+- Registros después del reinicio: 6.
+

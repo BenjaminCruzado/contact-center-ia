@@ -17,5 +17,8 @@ class DocumentProcessingResponse(BaseModel):
     chunk_size: int = Field(ge=1)
     chunk_overlap: int = Field(ge=0)
     total_chunks: int = Field(ge=1)
+    indexed_chunks: int = Field(default=0, ge=0)
+    collection: str | None = None
+    embedding_model: str | None = None
     chunks: list[TextChunkResponse]
 

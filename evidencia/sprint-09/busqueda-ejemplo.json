@@ -1,0 +1,34 @@
+{
+  "validation_mode": "deterministic-vector-integration",
+  "note": "Valida el motor RAG y ChromaDB sin consumir OpenAI. La validación real del proveedor requiere OPENAI_API_KEY.",
+  "query": "¿Cómo conserva el sistema el contexto?",
+  "total_results": 3,
+  "collection": "contact-center-documents",
+  "results": [
+    {
+      "position": 1,
+      "chunk_id": "documento-prueba-0001",
+      "document": "documento_prueba.pdf",
+      "similarity": 0.998792,
+      "similarity_percentage": 99.88,
+      "chunk_index": 0
+    },
+    {
+      "position": 2,
+      "chunk_id": "documento-prueba-0002",
+      "document": "documento_prueba.pdf",
+      "similarity": 0.994801,
+      "similarity_percentage": 99.48,
+      "chunk_index": 1
+    },
+    {
+      "position": 3,
+      "chunk_id": "documento-prueba-0003",
+      "document": "documento_prueba.pdf",
+      "similarity": 0.981615,
+      "similarity_percentage": 98.16,
+      "chunk_index": 2
+    }
+  ]
+}
+

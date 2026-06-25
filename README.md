@@ -1,8 +1,9 @@
 # Contact Center automatizado con IA
 
 Base operativa del backend para el prototipo académico de Contact Center. Este
-proyecto ya incorpora el flujo mínimo del Sprint 08 para procesar PDFs en
-memoria; todavía no incorpora RAG, LLM, STT, TTS ni telefonía.
+proyecto incorpora ingesta de PDFs y recuperación semántica mediante OpenAI
+Embeddings y ChromaDB. Todavía no incorpora generación final con LLM, STT, TTS
+ni telefonía.
 
 ## Requisitos
 
@@ -44,8 +45,31 @@ curl.exe -X POST `
   -F "file=@ruta/al/documento.pdf;type=application/pdf"
 ```
 
-La respuesta contiene el texto extraído y segmentado en memoria. Los PDFs
-escaneados sin capa de texto requieren OCR y no forman parte del Sprint 08.
+La respuesta contiene el texto extraído, segmentado e indexado en ChromaDB.
+Los PDFs escaneados sin capa de texto requieren OCR y no forman parte del MVP.
+
+## Búsqueda semántica
+
+```powershell
+$body = @{
+  query = "¿Cómo conserva contexto el sistema?"
+  top_k = 3
+} | ConvertTo-Json
+
+Invoke-RestMethod `
+  -Method Post `
+  -Uri http://localhost:8000/documentos/buscar `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+Antes de levantar Docker, agrega una clave válida exclusivamente en `.env`:
+
+```dotenv
+OPENAI_API_KEY=tu_clave_local
+```
+
+El archivo `.env` no se versiona.
 
 ## Operación
 

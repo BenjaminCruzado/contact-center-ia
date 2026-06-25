@@ -1,0 +1,18 @@
+Sprint 09 - Búsqueda semántica
+Fecha: 2026-06-24
+
+Modo: validación determinística del motor vectorial
+Consulta: ¿Cómo conserva el sistema el contexto?
+Colección: contact-center-documents
+
+Resultado semántico: posición=1 chunk=documento-prueba-0001 score=99.88% documento=documento_prueba.pdf
+Resultado semántico: posición=2 chunk=documento-prueba-0002 score=99.48% documento=documento_prueba.pdf
+Resultado semántico: posición=3 chunk=documento-prueba-0003 score=98.16% documento=documento_prueba.pdf
+
+Total de resultados: 3
+Orden: similitud descendente
+
+Nota: esta ejecución valida ChromaDB, distancia coseno y la lógica RAG sin
+consumir créditos. La llamada real a OpenAI queda pendiente de configurar
+OPENAI_API_KEY en el archivo local .env.
+

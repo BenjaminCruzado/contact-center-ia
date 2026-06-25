@@ -1,0 +1,20 @@
+Sprint 09 - Pruebas automatizadas
+Fecha: 2026-06-24
+
+Comando:
+docker compose exec -T api pytest -q
+
+Resultado:
+.......................                                                  [100%]
+23 passed in 1.39s
+
+Validaciones adicionales:
+- FastAPI: healthy
+- ChromaDB: healthy
+- ChromaDB heartbeat: OK
+- Colección HNSW con distancia coseno: OK
+- Persistencia después de reinicio: 6 registros
+- Target Docker de producción: compilado correctamente
+- Compilación Python (compileall): OK
+- Sin OPENAI_API_KEY: HTTP 503 controlado y sin exposición de secretos
+
