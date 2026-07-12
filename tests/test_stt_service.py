@@ -1,6 +1,11 @@
 import pytest
 
-from app.services.stt_service import MockSttService, SttProviderError
+from app.services.stt_service import (
+    MockSttService,
+    SttProviderError,
+    get_stt_service,
+)
+from app.config.settings import settings
 
 
 def test_mock_stt_uses_transcript_hint() -> None:
@@ -37,3 +42,10 @@ def test_mock_stt_rejects_unreadable_input() -> None:
             filename="---.wav",
             content_type="audio/wav",
         )
+
+
+def test_factory_caches_default_stt_service() -> None:
+    first = get_stt_service(settings)
+    second = get_stt_service(settings)
+
+    assert first is second

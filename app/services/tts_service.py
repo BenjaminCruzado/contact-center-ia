@@ -5,6 +5,7 @@ import struct
 import subprocess
 import tempfile
 import wave
+from functools import lru_cache
 from pathlib import Path
 from typing import Protocol
 
@@ -112,10 +113,26 @@ class LocalEspeakTtsService:
 
 
 def get_tts_service(app_settings: Settings = settings) -> TtsService:
-    if app_settings.tts_provider == "mock":
-        return MockTtsService()
-    if app_settings.tts_provider == "local":
-        return LocalEspeakTtsService(app_settings)
+    if app_settings is settings:
+        if app_settings.tts_provider == "mock":
+            return _get_cached_mock_tts_service()
+        if app_settings.tts_provider == "local":
+            return _get_cached_local_tts_service()
+    else:
+        if app_settings.tts_provider == "mock":
+            return MockTtsService()
+        if app_settings.tts_provider == "local":
+            return LocalEspeakTtsService(app_settings)
     raise TtsConfigurationError(
         f"Proveedor TTS no soportado: {app_settings.tts_provider}"
     )
+
+
+@lru_cache(maxsize=1)
+def _get_cached_mock_tts_service() -> MockTtsService:
+    return MockTtsService()
+
+
+@lru_cache(maxsize=1)
+def _get_cached_local_tts_service() -> LocalEspeakTtsService:
+    return LocalEspeakTtsService(settings)

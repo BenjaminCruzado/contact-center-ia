@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -38,6 +40,7 @@ PDF_CONTENT_TYPES = {"application/pdf", "application/x-pdf"}
 MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
 
 
+@lru_cache(maxsize=1)
 def get_rag_service() -> RagService:
     return RagService()
 

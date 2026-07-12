@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Sequence
+from functools import lru_cache
 from typing import Any, Protocol
 
 from openai import (
@@ -183,10 +184,26 @@ class OpenAIEmbeddingService:
 def get_embedding_service(
     app_settings: Settings = settings,
 ) -> EmbeddingService:
-    if app_settings.embedding_provider == "local":
-        return LocalEmbeddingService(app_settings)
-    if app_settings.embedding_provider == "openai":
-        return OpenAIEmbeddingService(app_settings)
+    if app_settings is settings:
+        if app_settings.embedding_provider == "local":
+            return _get_cached_local_embedding_service()
+        if app_settings.embedding_provider == "openai":
+            return _get_cached_openai_embedding_service()
+    else:
+        if app_settings.embedding_provider == "local":
+            return LocalEmbeddingService(app_settings)
+        if app_settings.embedding_provider == "openai":
+            return OpenAIEmbeddingService(app_settings)
     raise EmbeddingConfigurationError(
         f"Proveedor de embeddings no soportado: {app_settings.embedding_provider}"
     )
+
+
+@lru_cache(maxsize=1)
+def _get_cached_local_embedding_service() -> LocalEmbeddingService:
+    return LocalEmbeddingService(settings)
+
+
+@lru_cache(maxsize=1)
+def _get_cached_openai_embedding_service() -> OpenAIEmbeddingService:
+    return OpenAIEmbeddingService(settings)

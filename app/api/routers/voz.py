@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -48,6 +50,7 @@ AUDIO_CONTENT_TYPES = {
 }
 
 
+@lru_cache(maxsize=1)
 def get_voice_orchestrator_service() -> VoiceOrchestratorService:
     return VoiceOrchestratorService()
 

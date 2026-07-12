@@ -1,6 +1,7 @@
 import logging
 import re
 from collections.abc import Sequence
+from functools import lru_cache
 from typing import Protocol
 
 import httpx
@@ -260,12 +261,35 @@ class OllamaLlmService:
 
 
 def get_llm_service(app_settings: Settings = settings) -> LlmService:
-    if app_settings.llm_provider == "mock":
-        return MockLlmService()
-    if app_settings.llm_provider == "ollama":
-        return OllamaLlmService(app_settings)
-    if app_settings.llm_provider == "openai":
-        return OpenAiLlmService(app_settings)
+    if app_settings is settings:
+        if app_settings.llm_provider == "mock":
+            return _get_cached_mock_llm_service()
+        if app_settings.llm_provider == "ollama":
+            return _get_cached_ollama_llm_service()
+        if app_settings.llm_provider == "openai":
+            return _get_cached_openai_llm_service()
+    else:
+        if app_settings.llm_provider == "mock":
+            return MockLlmService()
+        if app_settings.llm_provider == "ollama":
+            return OllamaLlmService(app_settings)
+        if app_settings.llm_provider == "openai":
+            return OpenAiLlmService(app_settings)
     raise LlmConfigurationError(
         f"Proveedor LLM no soportado: {app_settings.llm_provider}"
     )
+
+
+@lru_cache(maxsize=1)
+def _get_cached_mock_llm_service() -> MockLlmService:
+    return MockLlmService()
+
+
+@lru_cache(maxsize=1)
+def _get_cached_ollama_llm_service() -> OllamaLlmService:
+    return OllamaLlmService(settings)
+
+
+@lru_cache(maxsize=1)
+def _get_cached_openai_llm_service() -> OpenAiLlmService:
+    return OpenAiLlmService(settings)

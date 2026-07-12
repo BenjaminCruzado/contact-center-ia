@@ -2,6 +2,7 @@ import logging
 import re
 import tempfile
 from collections.abc import Sequence
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -140,10 +141,26 @@ class LocalWhisperSttService:
 
 
 def get_stt_service(app_settings: Settings = settings) -> SttService:
-    if app_settings.stt_provider == "mock":
-        return MockSttService()
-    if app_settings.stt_provider == "local":
-        return LocalWhisperSttService(app_settings)
+    if app_settings is settings:
+        if app_settings.stt_provider == "mock":
+            return _get_cached_mock_stt_service()
+        if app_settings.stt_provider == "local":
+            return _get_cached_local_whisper_stt_service()
+    else:
+        if app_settings.stt_provider == "mock":
+            return MockSttService()
+        if app_settings.stt_provider == "local":
+            return LocalWhisperSttService(app_settings)
     raise SttConfigurationError(
         f"Proveedor STT no soportado: {app_settings.stt_provider}"
     )
+
+
+@lru_cache(maxsize=1)
+def _get_cached_mock_stt_service() -> MockSttService:
+    return MockSttService()
+
+
+@lru_cache(maxsize=1)
+def _get_cached_local_whisper_stt_service() -> LocalWhisperSttService:
+    return LocalWhisperSttService(settings)

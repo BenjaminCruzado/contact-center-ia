@@ -3,7 +3,7 @@ services:
     container_name: contact-center-api
     build:
       context: .
-      target: development
+      target: production
     env_file:
       - path: .env
         required: false
@@ -25,7 +25,6 @@ services:
     ports:
       - "${APP_PORT:-8000}:8000"
     volumes:
-      - ./app:/app/app
       - embedding-models:/models
       - audit-data:/data
     restart: unless-stopped

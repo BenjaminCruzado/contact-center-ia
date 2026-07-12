@@ -9,6 +9,7 @@ from app.services.embedding_service import (
     OpenAIEmbeddingService,
     get_embedding_service,
 )
+from app.config.settings import settings
 
 
 class FakeEmbeddingsResource:
@@ -75,3 +76,10 @@ def test_factory_selects_provider() -> None:
         get_embedding_service(Settings(embedding_provider="openai")),
         OpenAIEmbeddingService,
     )
+
+
+def test_factory_caches_default_embedding_service() -> None:
+    first = get_embedding_service(settings)
+    second = get_embedding_service(settings)
+
+    assert first is second
