@@ -1,4 +1,4 @@
-from app.schemas.orchestrator import OrchestratorResponse
+from app.schemas.orchestrator import OrchestratorResponse, OrchestratorTrace
 from app.services.voice_orchestrator_service import VoiceOrchestratorService
 
 
@@ -29,18 +29,27 @@ class FakeTtsService:
 
 class FakeTextOrchestratorService:
     def respond(self, query: str, top_k: int) -> OrchestratorResponse:
+        return self.respond_with_trace(query, top_k).response
+
+    def respond_with_trace(self, query: str, top_k: int) -> OrchestratorTrace:
         assert query
         assert top_k == 3
-        return OrchestratorResponse(
-            query=query,
-            status="answered",
-            answer="Respuesta textual",
-            collection="test-collection",
-            llm_provider="mock",
-            llm_model="mock-rag-responder-v1",
-            llm_invoked=True,
-            total_sources=2,
-            sources=[],
+        return OrchestratorTrace(
+            response=OrchestratorResponse(
+                query=query,
+                status="answered",
+                answer="Respuesta textual",
+                collection="test-collection",
+                llm_provider="mock",
+                llm_model="mock-rag-responder-v1",
+                llm_invoked=True,
+                total_sources=2,
+                sources=[],
+            ),
+            rag_latency_ms=18.0,
+            llm_latency_ms=32.0,
+            total_latency_ms=50.0,
+            top_score=0.88,
         )
 
 
@@ -62,3 +71,5 @@ def test_voice_orchestrator_returns_audio_and_metadata() -> None:
     assert result.answer == "Respuesta textual"
     assert result.audio_bytes == b"RIFFmock-audio"
     assert result.total_sources == 2
+    assert result.confidence_label == "ok"
+    assert result.top_score == 0.88

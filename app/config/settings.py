@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = Field(default="Contact Center API", min_length=1)
-    app_version: str = Field(default="0.5.0", min_length=1)
+    app_version: str = Field(default="0.6.0", min_length=1)
     app_env: Literal["development", "testing", "production"] = "development"
     app_debug: bool = False
     app_host: str = "0.0.0.0"
@@ -44,6 +44,10 @@ class Settings(BaseSettings):
     tts_voice: str = Field(default="es-la", min_length=1)
     audio_max_file_size_bytes: int = Field(default=12 * 1024 * 1024, ge=1024)
     audio_output_mime_type: str = Field(default="audio/wav", min_length=1)
+    audit_db_path: str = Field(default="/tmp/contact-center-audit.db", min_length=1)
+    audit_confidence_threshold: float = Field(default=0.45, ge=0, le=1)
+    audit_high_latency_ms: float = Field(default=3000.0, gt=0)
+    audit_history_limit: int = Field(default=100, ge=1, le=1000)
     chroma_host: str = Field(default="chroma", min_length=1)
     chroma_port: int = Field(default=8000, ge=1, le=65535)
     chroma_host_port: int = Field(default=8001, ge=1, le=65535)

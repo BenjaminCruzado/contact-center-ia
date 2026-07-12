@@ -3,7 +3,11 @@ from fastapi.testclient import TestClient
 
 from app.api.routers.orquestador import get_orchestrator_service
 from app.main import app
-from app.schemas.orchestrator import OrchestratorResponse, OrchestratorSource
+from app.schemas.orchestrator import (
+    OrchestratorResponse,
+    OrchestratorSource,
+    OrchestratorTrace,
+)
 
 
 class FakeOrchestratorService:
@@ -11,6 +15,9 @@ class FakeOrchestratorService:
         self.status = status
 
     def respond(self, query: str, top_k: int) -> OrchestratorResponse:
+        return self.respond_with_trace(query, top_k).response
+
+    def respond_with_trace(self, query: str, top_k: int) -> OrchestratorTrace:
         source = OrchestratorSource(
             position=1,
             chunk_id="chunk-1",
@@ -21,28 +28,40 @@ class FakeOrchestratorService:
             chunk_index=0,
         )
         if self.status == "out_of_scope":
-            return OrchestratorResponse(
+            return OrchestratorTrace(
+                response=OrchestratorResponse(
+                    query=query,
+                    status="out_of_scope",
+                    answer="No encontré información suficiente en los documentos cargados para responder esa consulta.",
+                    collection="test-collection",
+                    llm_provider="mock",
+                    llm_model="mock-rag-responder-v1",
+                    llm_invoked=False,
+                    total_sources=0,
+                    sources=[],
+                ),
+                rag_latency_ms=12.0,
+                llm_latency_ms=0.0,
+                total_latency_ms=12.0,
+                top_score=0.10,
+            )
+
+        return OrchestratorTrace(
+            response=OrchestratorResponse(
                 query=query,
-                status="out_of_scope",
-                answer="No encontré información suficiente en los documentos cargados para responder esa consulta.",
+                status="answered",
+                answer=f"Respuesta para {query}",
                 collection="test-collection",
                 llm_provider="mock",
                 llm_model="mock-rag-responder-v1",
-                llm_invoked=False,
-                total_sources=0,
-                sources=[],
-            )
-
-        return OrchestratorResponse(
-            query=query,
-            status="answered",
-            answer=f"Respuesta para {query}",
-            collection="test-collection",
-            llm_provider="mock",
-            llm_model="mock-rag-responder-v1",
-            llm_invoked=True,
-            total_sources=min(top_k, 1),
-            sources=[source],
+                llm_invoked=True,
+                total_sources=min(top_k, 1),
+                sources=[source],
+            ),
+            rag_latency_ms=12.0,
+            llm_latency_ms=25.0,
+            total_latency_ms=37.0,
+            top_score=0.90,
         )
 
 

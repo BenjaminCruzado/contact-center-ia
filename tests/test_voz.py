@@ -20,6 +20,14 @@ def build_wav_bytes() -> bytes:
 
 
 class FakeVoiceOrchestratorService:
+    class _Provider:
+        def __init__(self, provider: str) -> None:
+            self.provider = provider
+
+    def __init__(self) -> None:
+        self.stt_service = self._Provider("mock")
+        self.tts_service = self._Provider("mock")
+
     def interact(
         self,
         audio_bytes: bytes,
@@ -42,6 +50,13 @@ class FakeVoiceOrchestratorService:
             llm_provider="mock",
             llm_model="mock-rag-responder-v1",
             total_sources=1,
+            confidence_label="ok",
+            top_score=0.81,
+            latency_total_ms=140.0,
+            latency_stt_ms=20.0,
+            latency_rag_ms=30.0,
+            latency_llm_ms=40.0,
+            latency_tts_ms=50.0,
         )
 
     def build_debug_response(
@@ -66,6 +81,13 @@ class FakeVoiceOrchestratorService:
             status=result.status,
             audio_size_bytes=len(result.audio_bytes),
             total_sources=result.total_sources,
+            confidence_label=result.confidence_label,
+            top_score=result.top_score,
+            latency_total_ms=result.latency_total_ms,
+            latency_stt_ms=result.latency_stt_ms,
+            latency_rag_ms=result.latency_rag_ms,
+            latency_llm_ms=result.latency_llm_ms,
+            latency_tts_ms=result.latency_tts_ms,
         )
 
 

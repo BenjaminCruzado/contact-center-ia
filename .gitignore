@@ -27,3 +27,6 @@ Thumbs.db
 # Evidencia temporal no seleccionada
 evidencia/**/temporal/
 
+# Base local de auditoría
+data/
+*.db

@@ -36,3 +36,11 @@ class OrchestratorResponse(BaseModel):
     llm_invoked: bool
     total_sources: int = Field(ge=0)
     sources: list[OrchestratorSource]
+
+
+class OrchestratorTrace(BaseModel):
+    response: OrchestratorResponse
+    rag_latency_ms: float = Field(ge=0)
+    llm_latency_ms: float = Field(ge=0)
+    total_latency_ms: float = Field(ge=0)
+    top_score: float | None = Field(default=None, ge=0, le=1)

@@ -18,6 +18,7 @@ services:
       HF_HUB_DISABLE_XET: "1"
       SENTENCE_TRANSFORMERS_HOME: /models/sentence-transformers
       WHISPER_CACHE_DIR: /models/whisper
+      AUDIT_DB_PATH: /data/audit.db
     depends_on:
       chroma:
         condition: service_healthy
@@ -26,6 +27,7 @@ services:
     volumes:
       - ./app:/app/app
       - embedding-models:/models
+      - audit-data:/data
     restart: unless-stopped
     healthcheck:
       test:
@@ -64,3 +66,4 @@ services:
 volumes:
   chroma-data:
   embedding-models:
+  audit-data:

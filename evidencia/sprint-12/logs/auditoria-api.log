@@ -1,0 +1,97 @@
+contact-center-api  | INFO:     Will watch for changes in these directories: ['/app']
+contact-center-api  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+contact-center-api  | INFO:     Started reloader process [1] using WatchFiles
+contact-center-api  | INFO:     Started server process [9]
+contact-center-api  | INFO:     Waiting for application startup.
+contact-center-api  | INFO:     Application startup complete.
+contact-center-api  | INFO:     Auditoría registrada: request_id=33307701-f606-48e8-9d46-b80aca00e56a endpoint=/health estado=received latencia_total_ms=0.29
+contact-center-api  | INFO:     127.0.0.1:58552 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     127.0.0.1:41340 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=9fa1e10e-9f99-4c8d-a062-89c7ab8c3402 endpoint=/health estado=received latencia_total_ms=0.55
+contact-center-api  | INFO:     Auditoría registrada: request_id=8a18eecb-262d-4bf5-b4a5-251a55d943c2 endpoint=/health estado=received latencia_total_ms=0.25
+contact-center-api  | INFO:     127.0.0.1:46606 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=1d636283-20b1-4e45-bcdf-7864bb334b6d endpoint=/health estado=received latencia_total_ms=0.26
+contact-center-api  | INFO:     127.0.0.1:41606 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=41429b79-5029-4f5f-9e17-956376f978d1 endpoint=/health estado=received latencia_total_ms=0.29
+contact-center-api  | INFO:     127.0.0.1:49814 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     127.0.0.1:32892 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=6c1cdae0-1463-49dd-b51a-159dcc51ad87 endpoint=/health estado=received latencia_total_ms=0.50
+contact-center-api  | INFO:     Auditoría registrada: request_id=004b965a-236f-4888-8cc1-778f3f63e629 endpoint=/orquestador/responder estado=received latencia_total_ms=1.24
+contact-center-api  | INFO:     172.22.0.1:53582 - "POST /orquestador/responder HTTP/1.1" 400 Bad Request
+contact-center-api  | INFO:     Cargando modelo Whisper local: modelo=tiny idioma=es
+contact-center-api  | 
+  0%|          | 0/352 [00:00<?, ?frames/s]
+100%|██████████| 352/352 [00:00<00:00, 600.83frames/s]
+100%|██████████| 352/352 [00:00<00:00, 600.58frames/s]
+contact-center-api  | INFO:     Audio transcrito: proveedor=local texto=Como concerla el contexto entre conzultas
+contact-center-api  | INFO:     Cargando modelo local de embeddings: modelo=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 dispositivo=cpu
+contact-center-api  | Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+contact-center-api  | 
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 199/199 [00:00<00:00, 2956.20it/s]
+contact-center-api  | INFO:     Embeddings locales generados: modelo=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 vectores=1 dimensiones=384
+contact-center-api  | INFO:     Resultado semántico: posición=1 chunk=documento-prueba-0006 score=50.86% documento=documento_prueba.pdf
+contact-center-api  | INFO:     Resultado semántico: posición=2 chunk=documento-prueba-0003 score=47.43% documento=documento_prueba.pdf
+contact-center-api  | INFO:     Resultado semántico: posición=3 chunk=documento-prueba-0004 score=37.69% documento=documento_prueba.pdf
+contact-center-api  | INFO:     Respuesta mock generada: consulta=Como concerla el contexto entre conzultas fragmentos=1
+contact-center-api  | INFO:     Orquestación completada: consulta=Como concerla el contexto entre conzultas proveedor_llm=mock fuentes=2
+contact-center-api  | INFO:     Audio sintetizado: proveedor=local voz=es-la bytes=428024
+contact-center-api  | INFO:     Flujo de voz completado: audio_entrada=audio-entrada.wav texto=Como concerla el contexto entre conzultas proveedor_stt=local proveedor_tts=local estado=answered
+contact-center-api  | WARNING:  Auditoría con alertas: request_id=41a9b43e-f2ca-4e25-9030-393bf2438d95 endpoint=/voz/interactuar-debug alertas=La latencia total superó el umbral configurado.
+contact-center-api  | INFO:     Auditoría registrada: request_id=41a9b43e-f2ca-4e25-9030-393bf2438d95 endpoint=/voz/interactuar-debug estado=answered latencia_total_ms=15843.35
+contact-center-api  | INFO:     172.22.0.1:41612 - "POST /voz/interactuar-debug?top_k=3 HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=301ff300-e2d2-4e47-82be-03956dd97d8b endpoint=/health estado=received latencia_total_ms=0.79
+contact-center-api  | INFO:     Auditoría registrada: request_id=a0acdb0c-8023-4d4b-be7b-71187ee0b129 endpoint=/health estado=received latencia_total_ms=14.93
+contact-center-api  | INFO:     127.0.0.1:44442 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=6bd6881b-3dd0-4e2b-b62e-3c353a9f5b1b endpoint=/orquestador/responder estado=received latencia_total_ms=20.58
+contact-center-api  | INFO:     172.22.0.1:41624 - "POST /orquestador/responder HTTP/1.1" 400 Bad Request
+contact-center-api  | INFO:     Auditoría registrada: request_id=b6b1f2c3-7cb8-49e8-82dd-0beb02801a08 endpoint=/orquestador/responder estado=received latencia_total_ms=0.41
+contact-center-api  | INFO:     172.22.0.1:34952 - "POST /orquestador/responder HTTP/1.1" 422 Unprocessable Entity
+contact-center-api  | INFO:     127.0.0.1:46898 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=949eb993-e543-411a-ba79-e5c21df0cb2f endpoint=/health estado=received latencia_total_ms=0.28
+contact-center-api  | INFO:     Cargando modelo local de embeddings: modelo=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 dispositivo=cpu
+contact-center-api  | 
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 199/199 [00:00<00:00, 2926.82it/s]
+contact-center-api  | INFO:     Embeddings locales generados: modelo=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 vectores=1 dimensiones=384
+contact-center-api  | INFO:     Resultado semántico: posición=1 chunk=documento-prueba-0002 score=58.08% documento=documento_prueba.pdf
+contact-center-api  | INFO:     Resultado semántico: posición=2 chunk=documento-prueba-0004 score=51.93% documento=documento_prueba.pdf
+contact-center-api  | INFO:     Resultado semántico: posición=3 chunk=documento-prueba-0001 score=50.35% documento=documento_prueba.pdf
+contact-center-api  | INFO:     Respuesta mock generada: consulta=¿Qué hace el sistema con los documentos PDF? fragmentos=1
+contact-center-api  | INFO:     Orquestación completada: consulta=¿Qué hace el sistema con los documentos PDF? proveedor_llm=mock fuentes=3
+contact-center-api  | WARNING:  Auditoría con alertas: request_id=c17f1fca-9100-4923-9696-f1c7b53f9b62 endpoint=/orquestador/responder alertas=La latencia total superó el umbral configurado.
+contact-center-api  | INFO:     Auditoría registrada: request_id=c17f1fca-9100-4923-9696-f1c7b53f9b62 endpoint=/orquestador/responder estado=answered latencia_total_ms=6917.29
+contact-center-api  | INFO:     172.22.0.1:33102 - "POST /orquestador/responder HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=8814bc6c-c952-4b18-ac70-0eec2aa8ee05 endpoint=/health estado=received latencia_total_ms=0.67
+contact-center-api  | INFO:     Auditoría registrada: request_id=051ee14c-55c8-4e51-84d8-2549807ad094 endpoint=/health estado=received latencia_total_ms=0.41
+contact-center-api  | INFO:     127.0.0.1:50586 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     127.0.0.1:55558 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=03a7fc7e-5d95-4ff9-9f71-4a9cbb702a15 endpoint=/health estado=received latencia_total_ms=0.26
+contact-center-api  | INFO:     Auditoría registrada: request_id=356ca988-c934-4818-981e-507082931eb8 endpoint=/health estado=received latencia_total_ms=0.24
+contact-center-api  | INFO:     127.0.0.1:34912 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     127.0.0.1:37238 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=a0a5e59a-7918-4d22-ae2b-145d6e2c3e6e endpoint=/health estado=received latencia_total_ms=0.32
+contact-center-api  | INFO:     127.0.0.1:60286 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=f2a9a1fe-e301-4758-820e-10c75f9a6fb0 endpoint=/health estado=received latencia_total_ms=0.24
+contact-center-api  | INFO:     127.0.0.1:43986 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=64b07c62-54f1-4218-8f6d-8641943ad10e endpoint=/health estado=received latencia_total_ms=0.29
+contact-center-api  | INFO:     Auditoría registrada: request_id=9960d772-159e-4f06-af57-8c8d4f89a729 endpoint=/auditoria/resumen estado=received latencia_total_ms=7.00
+contact-center-api  | INFO:     172.22.0.1:35572 - "GET /auditoria/resumen HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=53b4a771-0148-46d8-b2bc-a21d354f938d endpoint=/auditoria/registros estado=received latencia_total_ms=3.10
+contact-center-api  | INFO:     172.22.0.1:35586 - "GET /auditoria/registros?limit=8 HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=0c588826-874b-4cf9-ad6f-4b5dcf612353 endpoint=/health estado=received latencia_total_ms=0.32
+contact-center-api  | INFO:     127.0.0.1:55234 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=d9eb8a45-0204-46b4-863b-f82e485fc9fe endpoint=/health estado=received latencia_total_ms=0.35
+contact-center-api  | INFO:     127.0.0.1:35058 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=cc3a962f-eb23-4b09-ad74-2d2efa73d48a endpoint=/auditoria/resumen estado=received latencia_total_ms=1.02
+contact-center-api  | INFO:     172.22.0.1:59890 - "GET /auditoria/resumen HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=b74ad709-9e19-479f-82d1-2571b11def79 endpoint=/auditoria/registros estado=received latencia_total_ms=1.42
+contact-center-api  | INFO:     172.22.0.1:59894 - "GET /auditoria/registros?limit=8 HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=c22e5a2d-09cd-443f-baa2-d151748cd2b9 endpoint=/health estado=received latencia_total_ms=0.58
+contact-center-api  | INFO:     127.0.0.1:45716 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     127.0.0.1:49628 - "GET /health HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=6f53d983-6883-4b51-897d-7c1aa7367ecc endpoint=/health estado=received latencia_total_ms=0.43
+contact-center-api  | INFO:     Auditoría registrada: request_id=efdaeeab-6c54-461f-975a-080d42e432e3 endpoint=/auditoria/resumen estado=received latencia_total_ms=0.90
+contact-center-api  | INFO:     172.22.0.1:55504 - "GET /auditoria/resumen HTTP/1.1" 200 OK
+contact-center-api  | INFO:     Auditoría registrada: request_id=e2c41f56-1c9e-4100-9383-c0e20cab8f1c endpoint=/auditoria/registros estado=received latencia_total_ms=2.50
+contact-center-api  | INFO:     172.22.0.1:55514 - "GET /auditoria/registros?limit=30 HTTP/1.1" 200 OK

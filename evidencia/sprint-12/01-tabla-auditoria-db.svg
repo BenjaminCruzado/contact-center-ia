@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="376">
+<rect width="100%" height="100%" fill="#0f172a" />
+<text x="24" y="36" fill="#93c5fd" font-family="Consolas, monospace" font-size="18">Sprint 12 - Tabla de auditoría exportada desde SQLite (/data/audit.db)</text>
+<text x="24" y="70" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">id | created_at | endpoint | interaction_type | status | confidence_label | latency_total_ms | top_score</text>
+<text x="24" y="94" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">------------------------------------------------------------------------------------------------------------------------</text>
+<text x="24" y="118" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">------------------------------</text>
+<text x="24" y="142" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">30 | 2026-07-12T08:26:26.918952+00:00 | /orquestador/responder | orchestrator | answered | ok | 6917.29 | 0.580762</text>
+<text x="24" y="166" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">28 | 2026-07-12T08:26:11.544289+00:00 | /orquestador/responder | http | received | ok | 0.41 | None</text>
+<text x="24" y="190" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">27 | 2026-07-12T08:26:04.349307+00:00 | /orquestador/responder | http | received | ok | 20.58 | None</text>
+<text x="24" y="214" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">24 | 2026-07-12T08:26:04.324562+00:00 | /voz/interactuar-debug | voice | answered | ok | 15843.35 | 0.508561</text>
+<text x="24" y="238" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">23 | 2026-07-12T08:25:40.354263+00:00 | /orquestador/responder | http | received | ok | 1.24 | None</text>
+<text x="24" y="262" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">18 | 2026-07-12T08:25:01.745110+00:00 | /voz/interactuar-debug | http | received | ok | 1.68 | None</text>
+<text x="24" y="286" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">17 | 2026-07-12T08:25:01.735565+00:00 | /voz/interactuar | voice | answered | ok | 1.67 | 0.81</text>
+</svg>

@@ -5,6 +5,7 @@ from fastapi import (
     Form,
     HTTPException,
     Query,
+    Request,
     UploadFile,
     status,
 )
@@ -12,6 +13,7 @@ from fastapi.responses import StreamingResponse
 
 from app.config.settings import settings
 from app.schemas.audio import AudioInteractionDebugResponse
+from app.services.audit_service import AuditService
 from app.services.embedding_service import (
     EmbeddingConfigurationError,
     EmbeddingProviderError,
@@ -112,11 +114,13 @@ async def _read_audio_upload(file: UploadFile) -> tuple[str, str, bytes]:
 
 @router.post("/interactuar", status_code=status.HTTP_200_OK)
 async def interact_with_voice(
+    request_context: Request,
     file: UploadFile = File(..., description="Audio grabado por el usuario."),
     top_k: int = Query(default=3, ge=1, le=10),
     transcript_hint: str | None = Form(default=None),
     voice_service: VoiceOrchestratorService = Depends(get_voice_orchestrator_service),
 ) -> StreamingResponse:
+    audit_service = AuditService()
     filename, content_type, audio_bytes = await _read_audio_upload(file)
 
     try:
@@ -128,12 +132,45 @@ async def interact_with_voice(
             transcript_hint=transcript_hint,
         )
     except Exception as exc:
+        audit_service.enrich_request(
+            request_context,
+            interaction_type="voice",
+            status="failed",
+            error_message=str(exc),
+            metadata={"input_filename": filename, "input_content_type": content_type},
+        )
         raise _handle_voice_error(exc) from exc
+
+    audit_service.enrich_request(
+        request_context,
+        interaction_type="voice",
+        user_query=result.transcript,
+        transcript=result.transcript,
+        response_text=result.answer,
+        status=result.status,
+        top_score=result.top_score,
+        total_sources=result.total_sources,
+        latency_stt_ms=result.latency_stt_ms,
+        latency_rag_ms=result.latency_rag_ms,
+        latency_llm_ms=result.latency_llm_ms,
+        latency_tts_ms=result.latency_tts_ms,
+        metadata={
+            "input_filename": filename,
+            "input_content_type": content_type,
+            "output_filename": result.output_filename,
+            "output_content_type": result.output_content_type,
+            "stt_provider": voice_service.stt_service.provider,
+            "tts_provider": voice_service.tts_service.provider,
+            "llm_provider": result.llm_provider,
+            "llm_model": result.llm_model,
+        },
+    )
 
     headers = {
         "X-Transcript": result.transcript,
         "X-Voice-Status": result.status,
         "X-LLM-Provider": result.llm_provider,
+        "X-Voice-Latency-Ms": f"{result.latency_total_ms:.2f}",
     }
     return StreamingResponse(
         iter([result.audio_bytes]),
@@ -148,11 +185,13 @@ async def interact_with_voice(
     status_code=status.HTTP_200_OK,
 )
 async def interact_with_voice_debug(
+    request_context: Request,
     file: UploadFile = File(..., description="Audio grabado por el usuario."),
     top_k: int = Query(default=3, ge=1, le=10),
     transcript_hint: str | None = Form(default=None),
     voice_service: VoiceOrchestratorService = Depends(get_voice_orchestrator_service),
 ) -> AudioInteractionDebugResponse:
+    audit_service = AuditService()
     filename, content_type, audio_bytes = await _read_audio_upload(file)
 
     try:
@@ -163,6 +202,37 @@ async def interact_with_voice_debug(
             top_k=top_k,
             transcript_hint=transcript_hint,
         )
+        audit_service.enrich_request(
+            request_context,
+            interaction_type="voice",
+            user_query=result.transcript,
+            transcript=result.transcript,
+            response_text=result.answer,
+            status=result.status,
+            top_score=result.top_score,
+            total_sources=result.total_sources,
+            latency_stt_ms=result.latency_stt_ms,
+            latency_rag_ms=result.latency_rag_ms,
+            latency_llm_ms=result.latency_llm_ms,
+            latency_tts_ms=result.latency_tts_ms,
+            metadata={
+                "input_filename": filename,
+                "input_content_type": content_type,
+                "output_filename": result.output_filename,
+                "output_content_type": result.output_content_type,
+                "stt_provider": voice_service.stt_service.provider,
+                "tts_provider": voice_service.tts_service.provider,
+                "llm_provider": result.llm_provider,
+                "llm_model": result.llm_model,
+            },
+        )
         return voice_service.build_debug_response(result, filename, content_type)
     except Exception as exc:
+        audit_service.enrich_request(
+            request_context,
+            interaction_type="voice",
+            status="failed",
+            error_message=str(exc),
+            metadata={"input_filename": filename, "input_content_type": content_type},
+        )
         raise _handle_voice_error(exc) from exc

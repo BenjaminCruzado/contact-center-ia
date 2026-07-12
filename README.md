@@ -154,6 +154,23 @@ TTS_VOICE=es-la
 Para pruebas rápidas también existe un modo `mock`, útil en tests y entornos
 sin descarga de modelos.
 
+## Auditoría y trazabilidad
+
+El Sprint 12 agrega un módulo de auditoría persistente en SQLite para registrar
+cada interacción del backend con:
+
+- latencia total del request
+- latencia por etapa del flujo de voz (STT, RAG, LLM y TTS)
+- score semántico principal
+- estado final de la interacción
+- alertas por baja confianza, fuera de contexto o alta latencia
+
+Endpoints disponibles:
+
+- `GET /auditoria/registros`
+- `GET /auditoria/registros/{id}`
+- `GET /auditoria/resumen`
+
 ## Operación
 
 ```powershell
@@ -192,3 +209,4 @@ Las evidencias de ingesta documental se organizan en `evidencia/sprint-08/`.
 Las evidencias del motor RAG se organizan en `evidencia/sprint-09/`.
 Las evidencias del orquestador se organizan en `evidencia/sprint-10/`.
 Las evidencias del flujo de voz se organizan en `evidencia/sprint-11/`.
+Las evidencias de auditoría se organizan en `evidencia/sprint-12/`.

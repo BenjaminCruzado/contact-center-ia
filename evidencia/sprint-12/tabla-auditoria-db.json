@@ -1,0 +1,256 @@
+[
+  {
+    "id": 30,
+    "created_at": "2026-07-12T08:26:26.918952+00:00",
+    "request_id": "c17f1fca-9100-4923-9696-f1c7b53f9b62",
+    "method": "POST",
+    "endpoint": "/orquestador/responder",
+    "interaction_type": "orchestrator",
+    "http_status": 200,
+    "status": "answered",
+    "confidence_label": "ok",
+    "user_query": "¿Qué hace el sistema con los documentos PDF?",
+    "transcript": null,
+    "response_text": "Según la documentación cargada, documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas.",
+    "top_score": 0.580762,
+    "latency_total_ms": 6917.29,
+    "latency_stt_ms": null,
+    "latency_rag_ms": 6915.08,
+    "latency_llm_ms": 0.06,
+    "latency_tts_ms": null,
+    "total_sources": 3,
+    "error_message": null,
+    "metadata": {
+      "alerts": {
+        "confidence_label": "ok",
+        "high_latency": true,
+        "messages": [
+          "La latencia total superó el umbral configurado."
+        ]
+      },
+      "client": {
+        "host": "172.22.0.1",
+        "port": 33102
+      },
+      "collection": "contact-center-documents-local-sentence-transformers-paraphrase-multilingual-minilm-l12-v2",
+      "llm_model": "mock-rag-responder-v1",
+      "llm_provider": "mock"
+    }
+  },
+  {
+    "id": 28,
+    "created_at": "2026-07-12T08:26:11.544289+00:00",
+    "request_id": "b6b1f2c3-7cb8-49e8-82dd-0beb02801a08",
+    "method": "POST",
+    "endpoint": "/orquestador/responder",
+    "interaction_type": "http",
+    "http_status": 422,
+    "status": "received",
+    "confidence_label": "ok",
+    "user_query": null,
+    "transcript": null,
+    "response_text": null,
+    "top_score": null,
+    "latency_total_ms": 0.41,
+    "latency_stt_ms": null,
+    "latency_rag_ms": null,
+    "latency_llm_ms": null,
+    "latency_tts_ms": null,
+    "total_sources": 0,
+    "error_message": null,
+    "metadata": {
+      "alerts": {
+        "confidence_label": "ok",
+        "high_latency": false,
+        "messages": []
+      },
+      "client": {
+        "host": "172.22.0.1",
+        "port": 34952
+      }
+    }
+  },
+  {
+    "id": 27,
+    "created_at": "2026-07-12T08:26:04.349307+00:00",
+    "request_id": "6bd6881b-3dd0-4e2b-b62e-3c353a9f5b1b",
+    "method": "POST",
+    "endpoint": "/orquestador/responder",
+    "interaction_type": "http",
+    "http_status": 400,
+    "status": "received",
+    "confidence_label": "ok",
+    "user_query": null,
+    "transcript": null,
+    "response_text": null,
+    "top_score": null,
+    "latency_total_ms": 20.58,
+    "latency_stt_ms": null,
+    "latency_rag_ms": null,
+    "latency_llm_ms": null,
+    "latency_tts_ms": null,
+    "total_sources": 0,
+    "error_message": null,
+    "metadata": {
+      "alerts": {
+        "confidence_label": "ok",
+        "high_latency": false,
+        "messages": []
+      },
+      "client": {
+        "host": "172.22.0.1",
+        "port": 41624
+      }
+    }
+  },
+  {
+    "id": 24,
+    "created_at": "2026-07-12T08:26:04.324562+00:00",
+    "request_id": "41a9b43e-f2ca-4e25-9030-393bf2438d95",
+    "method": "POST",
+    "endpoint": "/voz/interactuar-debug",
+    "interaction_type": "voice",
+    "http_status": 200,
+    "status": "answered",
+    "confidence_label": "ok",
+    "user_query": "Como concerla el contexto entre conzultas",
+    "transcript": "Como concerla el contexto entre conzultas",
+    "response_text": "Según la documentación cargada, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas.",
+    "top_score": 0.508561,
+    "latency_total_ms": 15843.35,
+    "latency_stt_ms": 4232.1,
+    "latency_rag_ms": 11508.89,
+    "latency_llm_ms": 0.17,
+    "latency_tts_ms": 84.4,
+    "total_sources": 2,
+    "error_message": null,
+    "metadata": {
+      "alerts": {
+        "confidence_label": "ok",
+        "high_latency": true,
+        "messages": [
+          "La latencia total superó el umbral configurado."
+        ]
+      },
+      "client": {
+        "host": "172.22.0.1",
+        "port": 41612
+      },
+      "input_content_type": "audio/wav",
+      "input_filename": "audio-entrada.wav",
+      "llm_model": "mock-rag-responder-v1",
+      "llm_provider": "mock",
+      "output_content_type": "audio/wav",
+      "output_filename": "respuesta-voz.wav",
+      "stt_provider": "local",
+      "tts_provider": "local"
+    }
+  },
+  {
+    "id": 23,
+    "created_at": "2026-07-12T08:25:40.354263+00:00",
+    "request_id": "004b965a-236f-4888-8cc1-778f3f63e629",
+    "method": "POST",
+    "endpoint": "/orquestador/responder",
+    "interaction_type": "http",
+    "http_status": 400,
+    "status": "received",
+    "confidence_label": "ok",
+    "user_query": null,
+    "transcript": null,
+    "response_text": null,
+    "top_score": null,
+    "latency_total_ms": 1.24,
+    "latency_stt_ms": null,
+    "latency_rag_ms": null,
+    "latency_llm_ms": null,
+    "latency_tts_ms": null,
+    "total_sources": 0,
+    "error_message": null,
+    "metadata": {
+      "alerts": {
+        "confidence_label": "ok",
+        "high_latency": false,
+        "messages": []
+      },
+      "client": {
+        "host": "172.22.0.1",
+        "port": 53582
+      }
+    }
+  },
+  {
+    "id": 18,
+    "created_at": "2026-07-12T08:25:01.745110+00:00",
+    "request_id": "bb4b0eb0-322b-4048-8312-2e31dad3f0de",
+    "method": "POST",
+    "endpoint": "/voz/interactuar-debug",
+    "interaction_type": "http",
+    "http_status": 415,
+    "status": "received",
+    "confidence_label": "ok",
+    "user_query": null,
+    "transcript": null,
+    "response_text": null,
+    "top_score": null,
+    "latency_total_ms": 1.68,
+    "latency_stt_ms": null,
+    "latency_rag_ms": null,
+    "latency_llm_ms": null,
+    "latency_tts_ms": null,
+    "total_sources": 0,
+    "error_message": null,
+    "metadata": {
+      "alerts": {
+        "confidence_label": "ok",
+        "high_latency": false,
+        "messages": []
+      },
+      "client": {
+        "host": "testclient",
+        "port": 50000
+      }
+    }
+  },
+  {
+    "id": 17,
+    "created_at": "2026-07-12T08:25:01.735565+00:00",
+    "request_id": "6e333a9b-ad40-4d18-b23f-658d94f619c9",
+    "method": "POST",
+    "endpoint": "/voz/interactuar",
+    "interaction_type": "voice",
+    "http_status": 200,
+    "status": "answered",
+    "confidence_label": "ok",
+    "user_query": "consulta de audio",
+    "transcript": "consulta de audio",
+    "response_text": "Respuesta desde voz",
+    "top_score": 0.81,
+    "latency_total_ms": 1.67,
+    "latency_stt_ms": 20.0,
+    "latency_rag_ms": 30.0,
+    "latency_llm_ms": 40.0,
+    "latency_tts_ms": 50.0,
+    "total_sources": 1,
+    "error_message": null,
+    "metadata": {
+      "alerts": {
+        "confidence_label": "ok",
+        "high_latency": false,
+        "messages": []
+      },
+      "client": {
+        "host": "testclient",
+        "port": 50000
+      },
+      "input_content_type": "audio/wav",
+      "input_filename": "entrada.wav",
+      "llm_model": "mock-rag-responder-v1",
+      "llm_provider": "mock",
+      "output_content_type": "audio/wav",
+      "output_filename": "respuesta-voz.wav",
+      "stt_provider": "mock",
+      "tts_provider": "mock"
+    }
+  }
+]

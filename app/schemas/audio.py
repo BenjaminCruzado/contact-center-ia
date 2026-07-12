@@ -18,3 +18,10 @@ class AudioInteractionMetadata(BaseModel):
 
 class AudioInteractionDebugResponse(AudioInteractionMetadata):
     total_sources: int = Field(ge=0)
+    confidence_label: str
+    top_score: float | None = Field(default=None, ge=0, le=1)
+    latency_total_ms: float = Field(ge=0)
+    latency_stt_ms: float = Field(ge=0)
+    latency_rag_ms: float = Field(ge=0)
+    latency_llm_ms: float = Field(ge=0)
+    latency_tts_ms: float = Field(ge=0)

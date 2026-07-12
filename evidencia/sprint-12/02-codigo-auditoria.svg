@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="3640">
+<rect width="100%" height="100%" fill="#0f172a" />
+<text x="24" y="36" fill="#93c5fd" font-family="Consolas, monospace" font-size="18">Sprint 12 - Código fuente del sistema de logging y monitoreo</text>
+<text x="24" y="70" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"># Middleware</text>
+<text x="24" y="94" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">from __future__ import annotations</text>
+<text x="24" y="118" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="142" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">import time</text>
+<text x="24" y="166" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">import uuid</text>
+<text x="24" y="190" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="214" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">from fastapi import Request</text>
+<text x="24" y="238" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">from starlette.middleware.base import BaseHTTPMiddleware</text>
+<text x="24" y="262" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">from starlette.responses import Response</text>
+<text x="24" y="286" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="310" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">from app.services.audit_service import AuditService</text>
+<text x="24" y="334" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="358" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="382" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">class AuditMiddleware(BaseHTTPMiddleware):</text>
+<text x="24" y="406" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">    def __init__(self, app, audit_service: AuditService | None = None) -&gt; None:</text>
+<text x="24" y="430" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        super().__init__(app)</text>
+<text x="24" y="454" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        self.audit_service = audit_service or AuditService()</text>
+<text x="24" y="478" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="502" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">    async def dispatch(self, request: Request, call_next) -&gt; Response:</text>
+<text x="24" y="526" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        request.state.request_id = str(uuid.uuid4())</text>
+<text x="24" y="550" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        request.state.audit_context = {</text>
+<text x="24" y="574" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;interaction_type&quot;: &quot;http&quot;,</text>
+<text x="24" y="598" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;status&quot;: &quot;received&quot;,</text>
+<text x="24" y="622" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;metadata&quot;: {},</text>
+<text x="24" y="646" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        }</text>
+<text x="24" y="670" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        started_at = time.perf_counter()</text>
+<text x="24" y="694" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="718" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        try:</text>
+<text x="24" y="742" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            response = await call_next(request)</text>
+<text x="24" y="766" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        except Exception as exc:</text>
+<text x="24" y="790" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            latency_total_ms = (time.perf_counter() - started_at) * 1000</text>
+<text x="24" y="814" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            self.audit_service.enrich_request(</text>
+<text x="24" y="838" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">                request,</text>
+<text x="24" y="862" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">                status=&quot;failed&quot;,</text>
+<text x="24" y="886" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">                error_message=str(exc),</text>
+<text x="24" y="910" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            )</text>
+<text x="24" y="934" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            self.audit_service.persist_request(</text>
+<text x="24" y="958" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">                request,</text>
+<text x="24" y="982" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">                http_status=500,</text>
+<text x="24" y="1006" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">                latency_total_ms=latency_total_ms,</text>
+<text x="24" y="1030" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">                error_message=str(exc),</text>
+<text x="24" y="1054" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            )</text>
+<text x="24" y="1078" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            raise</text>
+<text x="24" y="1102" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="1126" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        latency_total_ms = (time.perf_counter() - started_at) * 1000</text>
+<text x="24" y="1150" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        response.headers[&quot;X-Request-Id&quot;] = request.state.request_id</text>
+<text x="24" y="1174" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        response.headers[&quot;X-Process-Time-Ms&quot;] = f&quot;{latency_total_ms:.2f}&quot;</text>
+<text x="24" y="1198" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        self.audit_service.persist_request(</text>
+<text x="24" y="1222" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            request,</text>
+<text x="24" y="1246" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            http_status=response.status_code,</text>
+<text x="24" y="1270" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            latency_total_ms=latency_total_ms,</text>
+<text x="24" y="1294" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        )</text>
+<text x="24" y="1318" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        return response</text>
+<text x="24" y="1342" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="1366" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"># Servicio</text>
+<text x="24" y="1390" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">from __future__ import annotations</text>
+<text x="24" y="1414" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="1438" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">import logging</text>
+<text x="24" y="1462" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">from datetime import UTC, datetime</text>
+<text x="24" y="1486" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">from typing import Any</text>
+<text x="24" y="1510" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="1534" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">from fastapi import Request</text>
+<text x="24" y="1558" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="1582" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">from app.config.settings import Settings, settings</text>
+<text x="24" y="1606" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">from app.db.audit_db import AuditDatabase</text>
+<text x="24" y="1630" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">from app.services.alert_service import build_alerts</text>
+<text x="24" y="1654" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="1678" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">logger = logging.getLogger(&quot;uvicorn.error&quot;)</text>
+<text x="24" y="1702" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="1726" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="1750" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">class AuditService:</text>
+<text x="24" y="1774" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">    def __init__(</text>
+<text x="24" y="1798" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        self,</text>
+<text x="24" y="1822" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        database: AuditDatabase | None = None,</text>
+<text x="24" y="1846" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        app_settings: Settings = settings,</text>
+<text x="24" y="1870" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">    ) -&gt; None:</text>
+<text x="24" y="1894" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        self.settings = app_settings</text>
+<text x="24" y="1918" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        self.database = database or AuditDatabase(app_settings)</text>
+<text x="24" y="1942" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="1966" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">    def initialize(self) -&gt; None:</text>
+<text x="24" y="1990" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        self.database.initialize()</text>
+<text x="24" y="2014" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="2038" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">    def enrich_request(self, request: Request, **values: Any) -&gt; None:</text>
+<text x="24" y="2062" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        context = getattr(request.state, &quot;audit_context&quot;, {})</text>
+<text x="24" y="2086" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        metadata = context.setdefault(&quot;metadata&quot;, {})</text>
+<text x="24" y="2110" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="2134" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        for key, value in values.items():</text>
+<text x="24" y="2158" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            if key == &quot;metadata&quot; and isinstance(value, dict):</text>
+<text x="24" y="2182" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">                metadata.update(value)</text>
+<text x="24" y="2206" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            else:</text>
+<text x="24" y="2230" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">                context[key] = value</text>
+<text x="24" y="2254" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="2278" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        request.state.audit_context = context</text>
+<text x="24" y="2302" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="2326" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">    def persist_request(</text>
+<text x="24" y="2350" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        self,</text>
+<text x="24" y="2374" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        request: Request,</text>
+<text x="24" y="2398" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        *,</text>
+<text x="24" y="2422" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        http_status: int,</text>
+<text x="24" y="2446" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        latency_total_ms: float,</text>
+<text x="24" y="2470" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        error_message: str | None = None,</text>
+<text x="24" y="2494" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">    ) -&gt; int:</text>
+<text x="24" y="2518" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        context = getattr(request.state, &quot;audit_context&quot;, {})</text>
+<text x="24" y="2542" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        status = str(context.get(&quot;status&quot;, &quot;received&quot;))</text>
+<text x="24" y="2566" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        top_score = context.get(&quot;top_score&quot;)</text>
+<text x="24" y="2590" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        alerts = build_alerts(</text>
+<text x="24" y="2614" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            status=status,</text>
+<text x="24" y="2638" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            top_score=top_score,</text>
+<text x="24" y="2662" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            latency_total_ms=latency_total_ms,</text>
+<text x="24" y="2686" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            app_settings=self.settings,</text>
+<text x="24" y="2710" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        )</text>
+<text x="24" y="2734" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        metadata = dict(context.get(&quot;metadata&quot;, {}))</text>
+<text x="24" y="2758" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        metadata[&quot;alerts&quot;] = alerts</text>
+<text x="24" y="2782" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        metadata[&quot;client&quot;] = {</text>
+<text x="24" y="2806" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;host&quot;: request.client.host if request.client else None,</text>
+<text x="24" y="2830" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;port&quot;: request.client.port if request.client else None,</text>
+<text x="24" y="2854" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        }</text>
+<text x="24" y="2878" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="2902" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        payload = {</text>
+<text x="24" y="2926" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;created_at&quot;: datetime.now(UTC).isoformat(),</text>
+<text x="24" y="2950" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;request_id&quot;: getattr(request.state, &quot;request_id&quot;, &quot;unknown&quot;),</text>
+<text x="24" y="2974" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;method&quot;: request.method,</text>
+<text x="24" y="2998" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;endpoint&quot;: request.url.path,</text>
+<text x="24" y="3022" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;interaction_type&quot;: str(context.get(&quot;interaction_type&quot;, &quot;http&quot;)),</text>
+<text x="24" y="3046" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;http_status&quot;: http_status,</text>
+<text x="24" y="3070" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;status&quot;: status if status in {&quot;answered&quot;, &quot;out_of_scope&quot;, &quot;failed&quot;, &quot;processed&quot;, &quot;received&quot;} else</text>
+<text x="24" y="3094" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">&quot;received&quot;,</text>
+<text x="24" y="3118" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;confidence_label&quot;: alerts[&quot;confidence_label&quot;],</text>
+<text x="24" y="3142" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;user_query&quot;: context.get(&quot;user_query&quot;),</text>
+<text x="24" y="3166" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;transcript&quot;: context.get(&quot;transcript&quot;),</text>
+<text x="24" y="3190" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;response_text&quot;: context.get(&quot;response_text&quot;),</text>
+<text x="24" y="3214" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;top_score&quot;: top_score,</text>
+<text x="24" y="3238" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;latency_total_ms&quot;: round(latency_total_ms, 2),</text>
+<text x="24" y="3262" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;latency_stt_ms&quot;: self._round_optional(context.get(&quot;latency_stt_ms&quot;)),</text>
+<text x="24" y="3286" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;latency_rag_ms&quot;: self._round_optional(context.get(&quot;latency_rag_ms&quot;)),</text>
+<text x="24" y="3310" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;latency_llm_ms&quot;: self._round_optional(context.get(&quot;latency_llm_ms&quot;)),</text>
+<text x="24" y="3334" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;latency_tts_ms&quot;: self._round_optional(context.get(&quot;latency_tts_ms&quot;)),</text>
+<text x="24" y="3358" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;total_sources&quot;: int(context.get(&quot;total_sources&quot;, 0)),</text>
+<text x="24" y="3382" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;error_message&quot;: error_message or context.get(&quot;error_message&quot;),</text>
+<text x="24" y="3406" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            &quot;metadata&quot;: metadata,</text>
+<text x="24" y="3430" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        }</text>
+<text x="24" y="3454" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        record_id = self.database.insert_log(payload)</text>
+<text x="24" y="3478" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16"></text>
+<text x="24" y="3502" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">        if alerts[&quot;messages&quot;]:</text>
+<text x="24" y="3526" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">            logger.warning(</text>
+<text x="24" y="3550" fill="#e2e8f0" font-family="Consolas, monospace" font-size="16">                &quot;Auditoría con alertas: request_id=%s endpoint=%s alertas=%s&quot;,</text>
+</svg>

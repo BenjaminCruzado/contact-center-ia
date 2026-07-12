@@ -79,3 +79,18 @@ def test_orchestrator_returns_out_of_scope_when_context_is_insufficient() -> Non
     assert response.llm_invoked is False
     assert response.total_sources == 0
     assert "No encontré información suficiente" in response.answer
+
+
+def test_orchestrator_trace_includes_timings_and_score() -> None:
+    service = OrchestratorService(
+        rag_service=FakeRagService(similarity=0.82),
+        llm_service=FakeLlmService(),
+        app_settings=Settings(rag_min_similarity=0.45, rag_min_results=1),
+    )
+
+    trace = service.respond_with_trace("¿Qué hace el sistema?", top_k=3)
+
+    assert trace.response.status == "answered"
+    assert trace.top_score == 0.82
+    assert trace.rag_latency_ms >= 0
+    assert trace.llm_latency_ms >= 0
