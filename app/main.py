@@ -5,6 +5,7 @@ from app.api.router import api_router
 from app.config.settings import settings
 from app.middleware.audit_middleware import AuditMiddleware
 from app.services.audit_service import AuditService
+from app.services.document_registry_service import DocumentRegistryService
 from app.services.warmup_service import WarmupService
 
 
@@ -16,6 +17,7 @@ def create_application() -> FastAPI:
         description="Core API del prototipo de Contact Center automatizado.",
     )
     AuditService().initialize()
+    DocumentRegistryService().initialize()
     application.add_middleware(
         CORSMiddleware,
         allow_origins=[settings.frontend_url],

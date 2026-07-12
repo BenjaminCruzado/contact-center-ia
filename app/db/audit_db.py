@@ -59,6 +59,22 @@ class AuditDatabase:
                 )
                 """
             )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS document_registry (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    created_at TEXT NOT NULL,
+                    document_name TEXT NOT NULL UNIQUE,
+                    slug TEXT NOT NULL,
+                    collection TEXT NOT NULL,
+                    pages INTEGER NOT NULL,
+                    total_chunks INTEGER NOT NULL,
+                    indexed_chunks INTEGER NOT NULL,
+                    embedding_provider TEXT,
+                    embedding_model TEXT
+                )
+                """
+            )
             connection.commit()
 
     def insert_log(self, payload: dict[str, Any]) -> int:
@@ -119,16 +135,32 @@ class AuditDatabase:
             connection.commit()
             return int(cursor.lastrowid)
 
-    def list_logs(self, limit: int) -> list[dict[str, Any]]:
+    def list_logs(
+        self,
+        limit: int,
+        *,
+        interaction_type: str | None = None,
+        endpoint: str | None = None,
+    ) -> list[dict[str, Any]]:
+        where_clauses: list[str] = []
+        parameters: list[Any] = []
+        if interaction_type:
+            where_clauses.append("interaction_type = ?")
+            parameters.append(interaction_type)
+        if endpoint:
+            where_clauses.append("endpoint = ?")
+            parameters.append(endpoint)
+        where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
         with _DB_LOCK, self._connect() as connection:
             rows = connection.execute(
-                """
+                f"""
                 SELECT *
                 FROM audit_logs
+                {where_sql}
                 ORDER BY id DESC
                 LIMIT ?
                 """,
-                (limit,),
+                (*parameters, limit),
             ).fetchall()
         return [self._row_to_dict(row) for row in rows]
 
@@ -182,3 +214,87 @@ class AuditDatabase:
         payload = dict(row)
         payload["metadata"] = json.loads(payload.pop("metadata_json") or "{}")
         return payload
+
+    def upsert_document(self, payload: dict[str, Any]) -> int:
+        with _DB_LOCK, self._connect() as connection:
+            cursor = connection.execute(
+                """
+                INSERT INTO document_registry (
+                    created_at,
+                    document_name,
+                    slug,
+                    collection,
+                    pages,
+                    total_chunks,
+                    indexed_chunks,
+                    embedding_provider,
+                    embedding_model
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(document_name) DO UPDATE SET
+                    created_at=excluded.created_at,
+                    slug=excluded.slug,
+                    collection=excluded.collection,
+                    pages=excluded.pages,
+                    total_chunks=excluded.total_chunks,
+                    indexed_chunks=excluded.indexed_chunks,
+                    embedding_provider=excluded.embedding_provider,
+                    embedding_model=excluded.embedding_model
+                """,
+                (
+                    payload["created_at"],
+                    payload["document_name"],
+                    payload["slug"],
+                    payload["collection"],
+                    payload["pages"],
+                    payload["total_chunks"],
+                    payload["indexed_chunks"],
+                    payload.get("embedding_provider"),
+                    payload.get("embedding_model"),
+                ),
+            )
+            connection.commit()
+            if cursor.lastrowid:
+                return int(cursor.lastrowid)
+            row = connection.execute(
+                "SELECT id FROM document_registry WHERE document_name = ?",
+                (payload["document_name"],),
+            ).fetchone()
+            return int(row["id"])
+
+    def list_documents(self) -> list[dict[str, Any]]:
+        with _DB_LOCK, self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT *
+                FROM document_registry
+                ORDER BY id DESC
+                """
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def get_document(self, document_id: int) -> dict[str, Any] | None:
+        with _DB_LOCK, self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT *
+                FROM document_registry
+                WHERE id = ?
+                """,
+                (document_id,),
+            ).fetchone()
+        return dict(row) if row else None
+
+    def delete_document(self, document_id: int) -> dict[str, Any] | None:
+        with _DB_LOCK, self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM document_registry WHERE id = ?",
+                (document_id,),
+            ).fetchone()
+            if row is None:
+                return None
+            connection.execute(
+                "DELETE FROM document_registry WHERE id = ?",
+                (document_id,),
+            )
+            connection.commit()
+        return dict(row)

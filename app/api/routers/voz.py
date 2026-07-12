@@ -171,6 +171,8 @@ async def interact_with_voice(
             "tts_provider": tts_provider,
             "llm_provider": result.llm_provider,
             "llm_model": result.llm_model,
+            "sources": [source.model_dump(mode="json") for source in result.sources],
+            "documents_used": sorted({source.document for source in result.sources}),
         },
     )
 
@@ -237,6 +239,8 @@ async def interact_with_voice_debug(
                 "tts_provider": tts_provider,
                 "llm_provider": result.llm_provider,
                 "llm_model": result.llm_model,
+                "sources": [source.model_dump(mode="json") for source in result.sources],
+                "documents_used": sorted({source.document for source in result.sources}),
             },
         )
         return voice_service.build_debug_response(result, filename, content_type)

@@ -1,10 +1,11 @@
 import logging
 import time
 from base64 import b64encode
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from app.config.settings import Settings, settings
 from app.schemas.audio import AudioInteractionDebugResponse
+from app.schemas.orchestrator import OrchestratorSource
 from app.services.alert_service import classify_confidence
 from app.services.orchestrator_service import OrchestratorService
 from app.services.stt_service import SttService, get_stt_service
@@ -33,6 +34,7 @@ class VoiceInteractionResult:
     latency_tts_ms: float
     transcript_base64: str
     answer_base64: str
+    sources: list[OrchestratorSource] = field(default_factory=list)
 
 
 class VoiceOrchestratorService:
@@ -99,6 +101,7 @@ class VoiceOrchestratorService:
             total_sources=orchestrated.total_sources,
             confidence_label=confidence_label,
             top_score=orchestrated_trace.top_score,
+            sources=orchestrated.sources,
             latency_total_ms=round(latency_total_ms, 2),
             latency_stt_ms=round(latency_stt_ms, 2),
             latency_rag_ms=orchestrated_trace.rag_latency_ms,

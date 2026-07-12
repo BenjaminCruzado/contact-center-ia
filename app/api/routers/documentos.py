@@ -12,13 +12,18 @@ from fastapi import (
 
 from app.api.deps import get_current_user, require_admin
 from app.config.settings import settings
-from app.schemas.document import DocumentProcessingResponse
+from app.schemas.document import (
+    DocumentCatalogItem,
+    DocumentDeleteResponse,
+    DocumentProcessingResponse,
+)
 from app.schemas.search import (
     SemanticSearchRequest,
     SemanticSearchResponse,
     VectorStoreStatusResponse,
 )
 from app.services.document_service import process_document
+from app.services.document_registry_service import DocumentRegistryService
 from app.services.embedding_service import (
     EmbeddingConfigurationError,
     EmbeddingProviderError,
@@ -45,6 +50,11 @@ def get_rag_service() -> RagService:
     return RagService()
 
 
+@lru_cache(maxsize=1)
+def get_document_registry_service() -> DocumentRegistryService:
+    return DocumentRegistryService()
+
+
 @router.post(
     "/subir",
     response_model=DocumentProcessingResponse,
@@ -56,6 +66,7 @@ async def upload_document(
     chunk_overlap: int = Query(default=settings.rag_default_chunk_overlap, ge=0, le=9_999),
     _: object = Depends(require_admin),
     rag_service: RagService = Depends(get_rag_service),
+    registry_service: DocumentRegistryService = Depends(get_document_registry_service),
 ) -> DocumentProcessingResponse:
     filename = file.filename or "documento.pdf"
     content_type = (file.content_type or "").lower()
@@ -94,7 +105,9 @@ async def upload_document(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
         )
-        return rag_service.index_document(document)
+        indexed_document = rag_service.index_document(document)
+        registry_service.register(indexed_document)
+        return indexed_document
     except (InvalidPdfError, EmptyDocumentError) as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -172,3 +185,50 @@ async def vector_store_status(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(exc),
         ) from exc
+
+
+@router.get(
+    "",
+    response_model=list[DocumentCatalogItem],
+    status_code=status.HTTP_200_OK,
+)
+async def list_documents(
+    _: object = Depends(require_admin),
+    registry_service: DocumentRegistryService = Depends(get_document_registry_service),
+) -> list[DocumentCatalogItem]:
+    return registry_service.list_documents()
+
+
+@router.delete(
+    "/{document_id}",
+    response_model=DocumentDeleteResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def delete_document(
+    document_id: int,
+    _: object = Depends(require_admin),
+    rag_service: RagService = Depends(get_rag_service),
+    registry_service: DocumentRegistryService = Depends(get_document_registry_service),
+) -> DocumentDeleteResponse:
+    document = registry_service.get_document(document_id)
+    if document is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No se encontró el documento solicitado.",
+        )
+
+    try:
+        rag_service.vector_store.delete_by_document(document.document_name)
+    except VectorStoreUnavailableError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
+
+    deleted = registry_service.delete_document(document_id)
+    if deleted is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No se encontró el documento solicitado.",
+        )
+    return deleted

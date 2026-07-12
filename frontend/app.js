@@ -28,9 +28,7 @@ function saveAuth(auth) {
 }
 
 function authHeaders() {
-  if (!state.auth?.token) {
-    return {};
-  }
+  if (!state.auth?.token) return {};
   return { Authorization: `Bearer ${state.auth.token}` };
 }
 
@@ -40,27 +38,36 @@ function decodeBase64Utf8(value) {
   return new TextDecoder("utf-8").decode(bytes);
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function formatStatusLabel(record) {
+  if (record.status === "out_of_scope") return "Sin información";
+  if (record.status === "answered") return "Respondida";
+  if (record.status === "failed") return "Error";
+  return record.status;
+}
+
 async function apiFetch(path, options = {}) {
-  const response = await fetch(`${API_BASE}${path}`, {
+  return fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
       ...(options.headers || {}),
       ...authHeaders(),
     },
   });
-  return response;
 }
 
 function render() {
-  if (!state.auth) {
-    renderLogin();
-    return;
-  }
-  if (state.auth.role === "admin") {
-    renderAdmin();
-    return;
-  }
-  renderUser();
+  if (!state.auth) return renderLogin();
+  if (state.auth.role === "admin") return renderAdmin();
+  return renderUser();
 }
 
 function renderLogin() {
@@ -68,7 +75,7 @@ function renderLogin() {
     <div class="shell">
       <div class="container hero">
         <section class="card stack">
-          <span class="badge">Contact Center IA · Sprint 13</span>
+          <span class="badge">Contact Center IA · Panel Web</span>
           <div>
             <h1 class="title">Bienvenido al prototipo web del Contact Center</h1>
             <p class="subtitle">
@@ -78,7 +85,7 @@ function renderLogin() {
           </div>
           <div class="status-box">
             <p class="status-line"><strong>Usuario final:</strong> habla, escucha la respuesta automática y lee el texto.</p>
-            <p class="status-line"><strong>Administrador:</strong> sube PDFs y revisa auditoría, logs y métricas.</p>
+            <p class="status-line"><strong>Administrador:</strong> gestiona documentos y revisa historial, trazabilidad y métricas.</p>
           </div>
         </section>
         <section class="card">
@@ -119,9 +126,7 @@ async function handleLogin(event) {
       body: JSON.stringify({ username, password }),
     });
     const payload = await response.json();
-    if (!response.ok) {
-      throw new Error(payload.detail || "No se pudo iniciar sesión.");
-    }
+    if (!response.ok) throw new Error(payload.detail || "No se pudo iniciar sesión.");
 
     saveAuth({
       token: payload.access_token,
@@ -147,7 +152,7 @@ function renderUser() {
       <div class="container stack">
         <div class="topbar">
           <div>
-            <h1>Bienvenido, ${state.auth.username}</h1>
+            <h1>Bienvenido, ${escapeHtml(state.auth.username)}</h1>
             <p class="subtitle">Habla con el asistente documental y escucha la respuesta automáticamente.</p>
           </div>
           <div class="actions">
@@ -203,9 +208,7 @@ async function startRecording() {
     state.chunks = [];
     state.mediaRecorder = new MediaRecorder(stream);
     state.mediaRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        state.chunks.push(event.data);
-      }
+      if (event.data.size > 0) state.chunks.push(event.data);
     };
     state.mediaRecorder.onstop = () => {
       state.recordedBlob = new Blob(state.chunks, { type: "audio/webm" });
@@ -225,9 +228,7 @@ async function startRecording() {
 function stopRecording() {
   const startBtn = document.getElementById("start-recording");
   const stopBtn = document.getElementById("stop-recording");
-  if (state.mediaRecorder && state.mediaRecorder.state !== "inactive") {
-    state.mediaRecorder.stop();
-  }
+  if (state.mediaRecorder && state.mediaRecorder.state !== "inactive") state.mediaRecorder.stop();
   stopBtn.disabled = true;
   startBtn.disabled = false;
 }
@@ -260,10 +261,8 @@ async function sendRecordedAudio() {
       throw new Error(errorPayload.detail || "No se pudo procesar el audio.");
     }
 
-    const transcriptB64 = response.headers.get("X-Transcript-B64");
-    const answerB64 = response.headers.get("X-Answer-B64");
-    transcript.textContent = decodeBase64Utf8(transcriptB64) || "Sin transcripción";
-    answer.textContent = decodeBase64Utf8(answerB64) || "Sin respuesta";
+    transcript.textContent = decodeBase64Utf8(response.headers.get("X-Transcript-B64")) || "Sin transcripción";
+    answer.textContent = decodeBase64Utf8(response.headers.get("X-Answer-B64")) || "Sin respuesta";
 
     const blob = await response.blob();
     const audioUrl = URL.createObjectURL(blob);
@@ -284,7 +283,7 @@ function renderAdmin() {
         <div class="topbar">
           <div>
             <h1>Panel de administración</h1>
-            <p class="subtitle">Gestiona documentos del RAG y revisa auditoría, logs y métricas del sistema.</p>
+            <p class="subtitle">Gestiona documentos del RAG y revisa historial, trazabilidad y métricas del sistema.</p>
           </div>
           <div class="actions">
             <button class="secondary" id="logout-btn">Cerrar sesión</button>
@@ -307,33 +306,65 @@ function renderAdmin() {
           <section class="card stack">
             <div>
               <h2 class="panel-title">Resumen de auditoría</h2>
-              <p class="panel-text">Visualiza las métricas acumuladas del sistema auditado en Sprint 12.</p>
+              <p class="panel-text">Visualiza las métricas acumuladas del sistema auditado.</p>
             </div>
             <div class="metric-grid" id="audit-summary"></div>
-            <button id="refresh-audit" class="secondary">Actualizar auditoría</button>
+            <button id="refresh-audit" class="secondary">Actualizar panel</button>
           </section>
         </div>
 
         <section class="card stack">
           <div>
-            <h2 class="panel-title">Registros recientes</h2>
-            <p class="panel-text">Últimas interacciones registradas por el módulo de auditoría.</p>
+            <h2 class="panel-title">Documentos cargados</h2>
+            <p class="panel-text">Visualiza los PDFs disponibles para el RAG y elimínalos cuando sea necesario.</p>
           </div>
           <div class="table-box table-wrap">
             <table>
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Endpoint</th>
-                  <th>Tipo</th>
+                  <th>Documento</th>
+                  <th>Páginas</th>
+                  <th>Chunks</th>
+                  <th>Fecha</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="documents-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card stack">
+          <div>
+            <h2 class="panel-title">Historial de consultas</h2>
+            <p class="panel-text">Revisa qué se preguntó, si fue respondido y cuánto tardó el sistema.</p>
+          </div>
+          <div class="table-box table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Fecha</th>
+                  <th>Consulta</th>
                   <th>Estado</th>
-                  <th>Confianza</th>
                   <th>Latencia</th>
                   <th>Score</th>
+                  <th>Detalle</th>
                 </tr>
               </thead>
               <tbody id="audit-table-body"></tbody>
             </table>
+          </div>
+        </section>
+
+        <section class="card stack">
+          <div>
+            <h2 class="panel-title">Detalle de trazabilidad</h2>
+            <p class="panel-text">Consulta, respuesta, documentos usados y fragmentos recuperados.</p>
+          </div>
+          <div class="status-box" id="audit-detail-box">
+            <p class="status-line">Selecciona una interacción del historial para ver su detalle.</p>
           </div>
         </section>
       </div>
@@ -342,8 +373,14 @@ function renderAdmin() {
 
   document.getElementById("logout-btn").addEventListener("click", logout);
   document.getElementById("upload-pdf").addEventListener("click", uploadPdf);
-  document.getElementById("refresh-audit").addEventListener("click", loadAuditData);
-  loadAuditData();
+  document.getElementById("refresh-audit").addEventListener("click", refreshAdminPanel);
+  document.getElementById("documents-table-body").addEventListener("click", handleDocumentActions);
+  document.getElementById("audit-table-body").addEventListener("click", handleAuditActions);
+  refreshAdminPanel();
+}
+
+async function refreshAdminPanel() {
+  await Promise.all([loadAuditData(), loadDocuments()]);
 }
 
 async function uploadPdf() {
@@ -366,13 +403,61 @@ async function uploadPdf() {
       body: formData,
     });
     const payload = await response.json();
-    if (!response.ok) {
-      throw new Error(payload.detail || "No se pudo subir el documento.");
-    }
+    if (!response.ok) throw new Error(payload.detail || "No se pudo subir el documento.");
     status.textContent = `Estado: ${payload.document} procesado con ${payload.total_chunks} chunks e indexado en ${payload.collection}.`;
-    await loadAuditData();
+    await refreshAdminPanel();
   } catch (error) {
     status.textContent = `Estado: ${error.message}`;
+  }
+}
+
+async function loadDocuments() {
+  const tbody = document.getElementById("documents-table-body");
+  tbody.innerHTML = `<tr><td colspan="6">Cargando documentos...</td></tr>`;
+
+  try {
+    const response = await apiFetch("/documentos");
+    const documents = await response.json();
+    if (!response.ok) throw new Error(documents.detail || "No se pudieron cargar los documentos.");
+
+    if (!documents.length) {
+      tbody.innerHTML = `<tr><td colspan="6">No hay documentos registrados.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = documents
+      .map(
+        (item) => `
+        <tr>
+          <td>${item.id}</td>
+          <td>${escapeHtml(item.document_name)}</td>
+          <td>${item.pages}</td>
+          <td>${item.indexed_chunks}</td>
+          <td>${new Date(item.created_at).toLocaleString()}</td>
+          <td><button class="danger" data-action="delete-document" data-id="${item.id}">Eliminar</button></td>
+        </tr>
+      `
+      )
+      .join("");
+  } catch (error) {
+    tbody.innerHTML = `<tr><td colspan="6">${escapeHtml(error.message)}</td></tr>`;
+  }
+}
+
+async function handleDocumentActions(event) {
+  const button = event.target.closest("button[data-action='delete-document']");
+  if (!button) return;
+  const documentId = button.dataset.id;
+  if (!window.confirm("¿Eliminar este documento y sus chunks indexados?")) return;
+
+  try {
+    const response = await apiFetch(`/documentos/${documentId}`, { method: "DELETE" });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.detail || "No se pudo eliminar el documento.");
+    document.getElementById("pdf-status").textContent = `Estado: documento ${payload.document_name} eliminado correctamente.`;
+    await refreshAdminPanel();
+  } catch (error) {
+    document.getElementById("pdf-status").textContent = `Estado: ${error.message}`;
   }
 }
 
@@ -380,22 +465,18 @@ async function loadAuditData() {
   const summaryEl = document.getElementById("audit-summary");
   const tbody = document.getElementById("audit-table-body");
   summaryEl.innerHTML = `<div class="metric"><span>Cargando</span><strong>...</strong></div>`;
-  tbody.innerHTML = `<tr><td colspan="7">Cargando registros...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="7">Cargando historial...</td></tr>`;
 
   try {
     const [summaryResp, recordsResp] = await Promise.all([
       apiFetch("/auditoria/resumen"),
-      apiFetch("/auditoria/registros?limit=10"),
+      apiFetch("/auditoria/registros?limit=20&interaction_type=voice"),
     ]);
     const summary = await summaryResp.json();
     const records = await recordsResp.json();
 
-    if (!summaryResp.ok) {
-      throw new Error(summary.detail || "No se pudo cargar el resumen.");
-    }
-    if (!recordsResp.ok) {
-      throw new Error(records.detail || "No se pudieron cargar los registros.");
-    }
+    if (!summaryResp.ok) throw new Error(summary.detail || "No se pudo cargar el resumen.");
+    if (!recordsResp.ok) throw new Error(records.detail || "No se pudo cargar el historial.");
 
     summaryEl.innerHTML = `
       <div class="metric"><span>Total registros</span><strong>${summary.total_records}</strong></div>
@@ -406,24 +487,74 @@ async function loadAuditData() {
       <div class="metric"><span>Fallidas</span><strong>${summary.failed_count}</strong></div>
     `;
 
+    if (!records.length) {
+      tbody.innerHTML = `<tr><td colspan="7">No hay consultas registradas todavía.</td></tr>`;
+      return;
+    }
+
     tbody.innerHTML = records
       .map(
         (item) => `
         <tr>
           <td>${item.id}</td>
-          <td>${item.endpoint}</td>
-          <td>${item.interaction_type}</td>
-          <td>${item.status}</td>
-          <td>${item.confidence_label}</td>
+          <td>${new Date(item.created_at).toLocaleString()}</td>
+          <td>${escapeHtml(item.transcript || item.user_query || "-")}</td>
+          <td>${formatStatusLabel(item)}</td>
           <td>${item.latency_total_ms} ms</td>
           <td>${item.top_score == null ? "-" : item.top_score}</td>
+          <td><button class="secondary" data-action="view-audit" data-id="${item.id}">Ver</button></td>
         </tr>
       `
       )
       .join("");
   } catch (error) {
-    summaryEl.innerHTML = `<div class="metric"><span>Error</span><strong>${error.message}</strong></div>`;
-    tbody.innerHTML = `<tr><td colspan="7">No se pudieron cargar los registros.</td></tr>`;
+    summaryEl.innerHTML = `<div class="metric"><span>Error</span><strong>${escapeHtml(error.message)}</strong></div>`;
+    tbody.innerHTML = `<tr><td colspan="7">No se pudo cargar el historial.</td></tr>`;
+  }
+}
+
+async function handleAuditActions(event) {
+  const button = event.target.closest("button[data-action='view-audit']");
+  if (!button) return;
+  await loadAuditDetail(button.dataset.id);
+}
+
+async function loadAuditDetail(recordId) {
+  const detailBox = document.getElementById("audit-detail-box");
+  detailBox.innerHTML = `<p class="status-line">Cargando detalle...</p>`;
+
+  try {
+    const response = await apiFetch(`/auditoria/registros/${recordId}`);
+    const record = await response.json();
+    if (!response.ok) throw new Error(record.detail || "No se pudo cargar el detalle.");
+
+    const sources = record.metadata?.sources || [];
+    const documentsUsed = record.metadata?.documents_used || [];
+
+    detailBox.innerHTML = `
+      <p class="status-line"><strong>Consulta:</strong> ${escapeHtml(record.transcript || record.user_query || "-")}</p>
+      <p class="status-line"><strong>Estado:</strong> ${escapeHtml(formatStatusLabel(record))}</p>
+      <p class="status-line"><strong>Respuesta:</strong> ${escapeHtml(record.response_text || "Sin respuesta registrada.")}</p>
+      <p class="status-line"><strong>Documentos utilizados:</strong> ${documentsUsed.length ? documentsUsed.map(escapeHtml).join(", ") : "Sin documentos registrados."}</p>
+      <p class="footer-note"><strong>Fragmentos recuperados:</strong></p>
+      ${
+        sources.length
+          ? sources
+              .map(
+                (source) => `
+                  <div class="status-box" style="margin-top:8px;">
+                    <p class="status-line"><strong>${escapeHtml(source.document)}</strong> · score ${escapeHtml(source.similarity_percentage)}% · páginas ${escapeHtml(source.page_start ?? "-")}-${escapeHtml(source.page_end ?? "-")}</p>
+                    <p class="footer-note">${escapeHtml(source.section_title || "Sin sección")}</p>
+                    <p class="footer-note">${escapeHtml(source.content)}</p>
+                  </div>
+                `
+              )
+              .join("")
+          : `<p class="footer-note">No hay fragmentos registrados para esta interacción.</p>`
+      }
+    `;
+  } catch (error) {
+    detailBox.innerHTML = `<p class="status-line">${escapeHtml(error.message)}</p>`;
   }
 }
 

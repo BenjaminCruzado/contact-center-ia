@@ -150,3 +150,23 @@ class VectorStoreService:
             raise VectorStoreUnavailableError(
                 "No fue posible ejecutar la búsqueda en ChromaDB."
             ) from exc
+
+    def delete_by_document(self, document: str) -> int:
+        try:
+            collection = self.get_collection()
+            before = int(collection.count())
+            collection.delete(where={"document": document})
+            after = int(collection.count())
+            deleted = max(0, before - after)
+        except Exception as exc:
+            raise VectorStoreUnavailableError(
+                "No fue posible eliminar los chunks del documento en ChromaDB."
+            ) from exc
+
+        logger.info(
+            "Chunks eliminados: colección=%s documento=%s registros=%s",
+            self.collection_name,
+            document,
+            deleted,
+        )
+        return deleted

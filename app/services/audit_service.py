@@ -101,8 +101,18 @@ class AuditService:
         )
         return record_id
 
-    def list_logs(self, limit: int | None = None) -> list[dict[str, Any]]:
-        return self.database.list_logs(limit or self.settings.audit_history_limit)
+    def list_logs(
+        self,
+        limit: int | None = None,
+        *,
+        interaction_type: str | None = None,
+        endpoint: str | None = None,
+    ) -> list[dict[str, Any]]:
+        return self.database.list_logs(
+            limit or self.settings.audit_history_limit,
+            interaction_type=interaction_type,
+            endpoint=endpoint,
+        )
 
     def get_log(self, log_id: int) -> dict[str, Any] | None:
         return self.database.get_log(log_id)

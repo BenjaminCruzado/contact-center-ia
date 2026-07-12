@@ -26,3 +26,23 @@ class DocumentProcessingResponse(BaseModel):
     embedding_model: str | None = None
     chunks: list[TextChunkResponse]
 
+
+class DocumentCatalogItem(BaseModel):
+    id: int = Field(ge=1)
+    created_at: str
+    document_name: str
+    slug: str
+    collection: str
+    pages: int = Field(ge=1)
+    total_chunks: int = Field(ge=0)
+    indexed_chunks: int = Field(ge=0)
+    embedding_provider: str | None = None
+    embedding_model: str | None = None
+
+
+class DocumentDeleteResponse(BaseModel):
+    id: int = Field(ge=1)
+    document_name: str
+    collection: str
+    deleted: bool = True
+

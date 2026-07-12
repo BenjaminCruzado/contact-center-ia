@@ -14,9 +14,18 @@ router = APIRouter(prefix="/auditoria", tags=["Auditoría"])
 )
 async def list_audit_logs(
     limit: int = Query(default=20, ge=1, le=200),
+    interaction_type: str | None = Query(default=None),
+    endpoint: str | None = Query(default=None),
     _: object = Depends(require_admin),
 ) -> list[AuditLogResponse]:
-    return [AuditLogResponse.model_validate(item) for item in AuditService().list_logs(limit)]
+    return [
+        AuditLogResponse.model_validate(item)
+        for item in AuditService().list_logs(
+            limit,
+            interaction_type=interaction_type,
+            endpoint=endpoint,
+        )
+    ]
 
 
 @router.get(
