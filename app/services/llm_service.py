@@ -3,6 +3,7 @@ import re
 from collections.abc import Sequence
 from typing import Protocol
 
+import httpx
 from openai import (
     APIConnectionError,
     APIStatusError,
@@ -57,6 +58,15 @@ def _trim_snippet(value: str, max_length: int = 220) -> str:
     if len(clean_value) <= max_length:
         return clean_value.rstrip(" .,:;")
     return clean_value[:max_length].rsplit(" ", 1)[0].rstrip(" .,:;") + "..."
+
+
+def _normalize_ollama_base_url(value: str) -> str:
+    normalized = value.strip().rstrip("/")
+    if not normalized:
+        raise LlmConfigurationError("OLLAMA_BASE_URL no está configurada.")
+    if normalized.endswith("/api"):
+        return normalized
+    return f"{normalized}/api"
 
 
 class MockLlmService:
@@ -173,9 +183,87 @@ class OpenAiLlmService:
         return answer
 
 
+class OllamaLlmService:
+    provider = "ollama"
+
+    def __init__(
+        self,
+        app_settings: Settings = settings,
+        client: httpx.Client | None = None,
+    ) -> None:
+        self.settings = app_settings
+        self.model = app_settings.ollama_model
+        self.base_url = _normalize_ollama_base_url(app_settings.ollama_base_url)
+        self._client = client
+
+    def _get_client(self) -> httpx.Client:
+        if self._client is None:
+            self._client = httpx.Client(timeout=self.settings.llm_timeout_seconds)
+        return self._client
+
+    def generate_answer(
+        self,
+        query: str,
+        context_results: Sequence[SemanticSearchResult],
+        system_prompt: str,
+        user_prompt: str,
+    ) -> str:
+        del query, context_results
+
+        if not self.model.strip():
+            raise LlmConfigurationError("OLLAMA_MODEL no está configurado.")
+
+        try:
+            response = self._get_client().post(
+                f"{self.base_url}/chat",
+                json={
+                    "model": self.model,
+                    "stream": False,
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                },
+            )
+            response.raise_for_status()
+        except httpx.ConnectError as exc:
+            raise LlmProviderError(
+                "No fue posible conectar con Ollama. Verifica que esté iniciado y accesible."
+            ) from exc
+        except httpx.TimeoutException as exc:
+            raise LlmProviderError(
+                "Ollama tardó demasiado en responder."
+            ) from exc
+        except httpx.HTTPStatusError as exc:
+            status_code = exc.response.status_code
+            detail = exc.response.text.strip()
+            if status_code == 404:
+                raise LlmProviderError(
+                    f"Ollama no encontró el modelo '{self.model}'. Descárgalo antes de usarlo."
+                ) from exc
+            raise LlmProviderError(
+                f"Ollama respondió con un error HTTP {status_code}: {detail or 'sin detalle'}"
+            ) from exc
+        except httpx.HTTPError as exc:
+            raise LlmProviderError(
+                "Ocurrió un error inesperado al consultar Ollama."
+            ) from exc
+
+        payload = response.json()
+        message = payload.get("message") or {}
+        answer = str(message.get("content") or "").strip()
+        if not answer:
+            raise LlmProviderError("Ollama devolvió una respuesta vacía.")
+
+        logger.info("Respuesta Ollama generada: modelo=%s", self.model)
+        return answer
+
+
 def get_llm_service(app_settings: Settings = settings) -> LlmService:
     if app_settings.llm_provider == "mock":
         return MockLlmService()
+    if app_settings.llm_provider == "ollama":
+        return OllamaLlmService(app_settings)
     if app_settings.llm_provider == "openai":
         return OpenAiLlmService(app_settings)
     raise LlmConfigurationError(

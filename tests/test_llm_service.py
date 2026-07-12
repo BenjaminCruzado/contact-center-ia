@@ -1,10 +1,13 @@
 import pytest
+import httpx
 
 from app.config.settings import Settings
 from app.schemas.search import SemanticSearchResult
 from app.services.llm_service import (
     LlmConfigurationError,
+    LlmProviderError,
     MockLlmService,
+    OllamaLlmService,
     OpenAiLlmService,
     get_llm_service,
 )
@@ -51,8 +54,89 @@ def test_openai_llm_requires_api_key_without_client() -> None:
         )
 
 
+def test_ollama_llm_returns_generated_answer() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.url == httpx.URL("http://localhost:11434/api/chat")
+        payload = {
+            "message": {
+                "role": "assistant",
+                "content": "Respuesta local de Ollama.",
+            }
+        }
+        return httpx.Response(status_code=200, json=payload)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    service = OllamaLlmService(
+        app_settings=Settings(
+            llm_provider="ollama",
+            ollama_base_url="http://localhost:11434",
+            ollama_model="llama3.1",
+        ),
+        client=client,
+    )
+
+    answer = service.generate_answer(
+        query="¿Qué hace el sistema?",
+        context_results=[sample_result()],
+        system_prompt="sistema",
+        user_prompt="usuario",
+    )
+
+    assert answer == "Respuesta local de Ollama."
+
+
+def test_ollama_llm_reports_missing_model() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(status_code=404, text="model not found")
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    service = OllamaLlmService(
+        app_settings=Settings(
+            llm_provider="ollama",
+            ollama_base_url="http://localhost:11434/api",
+            ollama_model="modelo-inexistente",
+        ),
+        client=client,
+    )
+
+    with pytest.raises(LlmProviderError):
+        service.generate_answer(
+            query="consulta",
+            context_results=[sample_result()],
+            system_prompt="sistema",
+            user_prompt="usuario",
+        )
+
+
+def test_ollama_llm_reports_connection_error() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("down", request=request)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    service = OllamaLlmService(
+        app_settings=Settings(
+            llm_provider="ollama",
+            ollama_base_url="http://localhost:11434/api",
+            ollama_model="llama3.1",
+        ),
+        client=client,
+    )
+
+    with pytest.raises(LlmProviderError):
+        service.generate_answer(
+            query="consulta",
+            context_results=[sample_result()],
+            system_prompt="sistema",
+            user_prompt="usuario",
+        )
+
+
 def test_llm_factory_selects_provider() -> None:
     assert isinstance(get_llm_service(Settings(llm_provider="mock")), MockLlmService)
+    assert isinstance(
+        get_llm_service(Settings(llm_provider="ollama")),
+        OllamaLlmService,
+    )
     assert isinstance(
         get_llm_service(Settings(llm_provider="openai")),
         OpenAiLlmService,

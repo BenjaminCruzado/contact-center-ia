@@ -110,6 +110,18 @@ RAG_MIN_SIMILARITY=0.45
 RAG_MIN_RESULTS=1
 ```
 
+Si quieres usar un LLM local real sin pagar API, puedes cambiar a Ollama:
+
+```dotenv
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://host.docker.internal:11434/api
+OLLAMA_MODEL=llama3.1
+```
+
+Debes tener Ollama ejecutándose en tu máquina host y haber descargado el modelo
+elegido. La API local oficial de Ollama expone por defecto
+`http://localhost:11434/api`.
+
 Si más adelante quieres usar OpenAI para la respuesta final:
 
 ```dotenv
@@ -156,7 +168,14 @@ TTS_VOICE=es-la
 ```
 
 Para pruebas rápidas también existe un modo `mock`, útil en tests y entornos
-sin descarga de modelos.
+sin descarga de modelos. Para demos con IA local real, se recomienda combinar:
+
+```dotenv
+EMBEDDING_PROVIDER=local
+LLM_PROVIDER=ollama
+STT_PROVIDER=local
+TTS_PROVIDER=local
+```
 
 ## Frontend web con roles
 

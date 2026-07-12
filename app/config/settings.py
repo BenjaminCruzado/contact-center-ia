@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     app_port: int = Field(default=8000, ge=1, le=65535)
     frontend_url: str = Field(default="http://localhost:3000", min_length=1)
     embedding_provider: Literal["local", "openai"] = "local"
-    llm_provider: Literal["mock", "openai"] = "mock"
+    llm_provider: Literal["mock", "openai", "ollama"] = "mock"
     stt_provider: Literal["mock", "local"] = "local"
     tts_provider: Literal["mock", "local"] = "local"
     auth_secret_key: str = Field(default="contact-center-dev-secret", min_length=16)
@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     openai_chat_model: str = Field(default="gpt-4o-mini", min_length=1)
     openai_timeout_seconds: float = Field(default=30.0, gt=0, le=120)
     openai_max_retries: int = Field(default=2, ge=0, le=5)
+    ollama_base_url: str = Field(
+        default="http://host.docker.internal:11434/api",
+        min_length=1,
+    )
+    ollama_model: str = Field(default="llama3.1", min_length=1)
     llm_timeout_seconds: float = Field(default=45.0, gt=0, le=180)
     llm_max_retries: int = Field(default=2, ge=0, le=5)
     rag_min_similarity: float = Field(default=0.45, ge=0, le=1)
