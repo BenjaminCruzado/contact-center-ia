@@ -19,6 +19,7 @@ class DocumentProcessingResponse(BaseModel):
     total_chunks: int = Field(ge=1)
     indexed_chunks: int = Field(default=0, ge=0)
     collection: str | None = None
+    embedding_provider: str | None = None
     embedding_model: str | None = None
     chunks: list[TextChunkResponse]
 

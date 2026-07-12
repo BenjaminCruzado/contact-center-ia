@@ -3,6 +3,7 @@ from app.services.rag_service import RagService, distance_to_similarity
 
 
 class FakeEmbeddingService:
+    provider = "test"
     model = "test-embedding"
 
     def embed_texts(self, texts: list[str]) -> list[list[float]]:

@@ -1,4 +1,5 @@
 import logging
+import re
 from collections.abc import Sequence
 from typing import Any
 
@@ -8,6 +9,13 @@ from app.config.settings import Settings, settings
 from app.schemas.document import TextChunkResponse
 
 logger = logging.getLogger("uvicorn.error")
+
+
+def build_collection_name(prefix: str, provider: str, model: str) -> str:
+    raw_name = f"{prefix}-{provider}-{model}".lower()
+    safe_name = re.sub(r"[^a-z0-9._-]+", "-", raw_name).strip("-._")
+    safe_name = re.sub(r"-{2,}", "-", safe_name)
+    return safe_name[:512].rstrip("-._")
 
 
 class VectorStoreError(RuntimeError):
@@ -27,13 +35,15 @@ class VectorStoreService:
         self,
         app_settings: Settings = settings,
         client: Any | None = None,
+        collection_name: str | None = None,
     ) -> None:
         self.settings = app_settings
         self._client = client
+        self._collection_name = collection_name
 
     @property
     def collection_name(self) -> str:
-        return self.settings.chroma_collection
+        return self._collection_name or self.settings.chroma_collection_prefix
 
     def _get_client(self) -> Any:
         if self._client is None:

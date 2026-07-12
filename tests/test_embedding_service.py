@@ -5,7 +5,9 @@ import pytest
 from app.config.settings import Settings
 from app.services.embedding_service import (
     EmbeddingConfigurationError,
-    EmbeddingService,
+    LocalEmbeddingService,
+    OpenAIEmbeddingService,
+    get_embedding_service,
 )
 
 
@@ -24,7 +26,7 @@ class FakeOpenAI:
 
 
 def test_embeddings_preserve_input_order() -> None:
-    service = EmbeddingService(client=FakeOpenAI())
+    service = OpenAIEmbeddingService(client=FakeOpenAI())
 
     result = service.embed_texts(["primero", "segundo"])
 
@@ -32,16 +34,44 @@ def test_embeddings_preserve_input_order() -> None:
 
 
 def test_rejects_empty_embedding_text() -> None:
-    service = EmbeddingService(client=FakeOpenAI())
+    service = OpenAIEmbeddingService(client=FakeOpenAI())
 
     with pytest.raises(ValueError):
         service.embed_texts(["texto", " "])
 
 
 def test_requires_api_key_without_injected_client() -> None:
-    service = EmbeddingService(
+    service = OpenAIEmbeddingService(
         app_settings=Settings(openai_api_key=None),
     )
 
     with pytest.raises(EmbeddingConfigurationError):
         service.embed_text("consulta")
+
+
+class FakeLocalModel:
+    def encode(self, texts: list[str], **_: object) -> object:
+        import numpy as np
+
+        return np.array([[float(index), 1.0] for index, _ in enumerate(texts)])
+
+
+def test_local_provider_generates_embeddings_without_api_key() -> None:
+    service = LocalEmbeddingService(
+        app_settings=Settings(embedding_provider="local"),
+        model_instance=FakeLocalModel(),
+    )
+
+    assert service.embed_texts(["uno", "dos"]) == [[0.0, 1.0], [1.0, 1.0]]
+    assert service.provider == "local"
+
+
+def test_factory_selects_provider() -> None:
+    assert isinstance(
+        get_embedding_service(Settings(embedding_provider="local")),
+        LocalEmbeddingService,
+    )
+    assert isinstance(
+        get_embedding_service(Settings(embedding_provider="openai")),
+        OpenAIEmbeddingService,
+    )

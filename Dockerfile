@@ -5,12 +5,18 @@ FROM python:3.12-slim AS base
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    HOME=/home/appuser \
+    XDG_CACHE_HOME=/models/.cache \
+    HF_HOME=/models/.cache/huggingface \
+    HF_HUB_DISABLE_XET=1
 
 WORKDIR /app
 
 RUN addgroup --system appgroup \
-    && adduser --system --ingroup appgroup appuser
+    && adduser --system --home /home/appuser --ingroup appgroup appuser \
+    && mkdir -p /home/appuser /models/sentence-transformers /models/.cache/huggingface \
+    && chown -R appuser:appgroup /home/appuser /models
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir --requirement requirements.txt

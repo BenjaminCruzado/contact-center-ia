@@ -1,25 +1,30 @@
-# Evidencias — Sprint 09
+# Evidencias - Sprint 09
 
-Este directorio reúne la validación del motor de recuperación semántica:
+Este directorio reúne la validación final del motor RAG del Sprint 09 con el
+proveedor local de embeddings como opción por defecto y OpenAI como alternativa
+configurable.
+
+Flujo validado:
 
 ```text
-PDF → chunks → embeddings → ChromaDB → búsqueda top 3
+PDF -> chunks -> embeddings -> ChromaDB -> busqueda top 3
 ```
 
-## Evidencias comprometidas
+Archivos principales:
 
 | Archivo | Demostración |
 | --- | --- |
-| `01-chromadb-registros.png` | Colección vectorial, índice coseno y registros persistidos |
-| `02-busqueda-semantica.png` | Tres fragmentos ordenados por similitud |
-| `03-logs-similitud.png` | Logs con los scores porcentuales |
-| `estado-vector-store.json` | Estado y cantidad de registros de ChromaDB |
-| `busqueda-ejemplo.json` | Respuesta estructurada del motor RAG |
-| `logs/chromadb.log` | Inicio y persistencia del contenedor vectorial |
-| `logs/busqueda-semantica.log` | Resultado textual de la búsqueda |
-| `logs/pruebas.txt` | Resultado de las pruebas automatizadas |
+| `01-chromadb-registros.png` | Estado del índice vectorial local con 6 registros y dimensión 384 |
+| `02-busqueda-semantica.png` | Respuesta real del endpoint `/documentos/buscar` con top 3 ordenado por similitud |
+| `03-logs-similitud.png` | Log final con los scores porcentuales de similitud |
+| `estado-vector-store.json` | Estado de la colección activa y cantidad de registros |
+| `busqueda-ejemplo.json` | Respuesta JSON estructurada del motor RAG |
+| `logs/chromadb.log` | Resumen del índice local persistido en ChromaDB |
+| `logs/busqueda-semantica.log` | Scores devueltos por la búsqueda semántica |
+| `logs/pruebas.txt` | Resultado de la suite automatizada: 26 pruebas exitosas |
 
-La clave `OPENAI_API_KEY` se mantiene exclusivamente en `.env`, archivo que no
-se versiona. Las pruebas automatizadas utilizan clientes simulados y no
-consumen créditos.
+Notas:
 
+- La colección validada es `contact-center-documents-local-sentence-transformers-paraphrase-multilingual-minilm-l12-v2`.
+- La dimensión efectiva de embeddings es `384`.
+- `OPENAI_API_KEY` sigue siendo opcional y se carga solo desde `.env`.

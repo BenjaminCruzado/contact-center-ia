@@ -12,6 +12,11 @@ services:
       APP_PORT: 8000
       CHROMA_HOST: chroma
       CHROMA_PORT: 8000
+      HOME: /home/appuser
+      XDG_CACHE_HOME: /models/.cache
+      HF_HOME: /models/.cache/huggingface
+      HF_HUB_DISABLE_XET: "1"
+      SENTENCE_TRANSFORMERS_HOME: /models/sentence-transformers
     depends_on:
       chroma:
         condition: service_healthy
@@ -19,6 +24,7 @@ services:
       - "${APP_PORT:-8000}:8000"
     volumes:
       - ./app:/app/app
+      - embedding-models:/models
     restart: unless-stopped
     healthcheck:
       test:
@@ -56,3 +62,4 @@ services:
 
 volumes:
   chroma-data:
+  embedding-models:

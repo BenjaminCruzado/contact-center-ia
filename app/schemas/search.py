@@ -28,6 +28,8 @@ class SemanticSearchResponse(BaseModel):
     query: str
     total_results: int = Field(ge=0)
     collection: str
+    embedding_provider: str
+    embedding_model: str
     results: list[SemanticSearchResult]
 
 
@@ -35,3 +37,5 @@ class VectorStoreStatusResponse(BaseModel):
     status: str
     collection: str
     records: int = Field(ge=0)
+    embedding_provider: str
+    embedding_model: str

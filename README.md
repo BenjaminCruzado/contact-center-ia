@@ -1,9 +1,9 @@
 # Contact Center automatizado con IA
 
 Base operativa del backend para el prototipo académico de Contact Center. Este
-proyecto incorpora ingesta de PDFs y recuperación semántica mediante OpenAI
-Embeddings y ChromaDB. Todavía no incorpora generación final con LLM, STT, TTS
-ni telefonía.
+proyecto incorpora ingesta de PDFs y recuperación semántica mediante embeddings
+locales u OpenAI, almacenados en ChromaDB. Todavía no incorpora generación
+final con LLM, STT, TTS ni telefonía.
 
 ## Requisitos
 
@@ -63,13 +63,23 @@ Invoke-RestMethod `
   -Body $body
 ```
 
-Antes de levantar Docker, agrega una clave válida exclusivamente en `.env`:
+Por defecto se utiliza un modelo multilingüe local y gratuito:
 
 ```dotenv
+EMBEDDING_PROVIDER=local
+LOCAL_EMBEDDING_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+```
+
+Para utilizar OpenAI más adelante:
+
+```dotenv
+EMBEDDING_PROVIDER=openai
 OPENAI_API_KEY=tu_clave_local
 ```
 
-El archivo `.env` no se versiona.
+Cada proveedor y modelo usa una colección Chroma independiente para impedir que
+se mezclen vectores con dimensiones incompatibles. El archivo `.env` no se
+versiona.
 
 ## Operación
 

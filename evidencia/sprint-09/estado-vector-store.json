@@ -1,17 +1,7 @@
-{
+﻿{
   "status": "active",
-  "collection": "contact-center-documents",
+  "collection": "contact-center-documents-local-sentence-transformers-paraphrase-multilingual-minilm-l12-v2",
   "records": 6,
-  "index": {
-    "type": "hnsw",
-    "space": "cosine",
-    "ef_construction": 100,
-    "ef_search": 100,
-    "max_neighbors": 16
-  },
-  "persistence": {
-    "container_path": "/data",
-    "verified_after_restart": true
-  }
+  "embedding_provider": "local",
+  "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 }
-

@@ -12,6 +12,17 @@ class Settings(BaseSettings):
     app_debug: bool = False
     app_host: str = "0.0.0.0"
     app_port: int = Field(default=8000, ge=1, le=65535)
+    embedding_provider: Literal["local", "openai"] = "local"
+    local_embedding_model: str = Field(
+        default="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        min_length=1,
+    )
+    local_embedding_device: str = Field(default="cpu", min_length=1)
+    local_embedding_batch_size: int = Field(default=16, ge=1, le=128)
+    sentence_transformers_home: str = Field(
+        default="/models/sentence-transformers",
+        min_length=1,
+    )
     openai_api_key: SecretStr | None = None
     openai_embedding_model: str = Field(
         default="text-embedding-3-small",
@@ -22,10 +33,10 @@ class Settings(BaseSettings):
     chroma_host: str = Field(default="chroma", min_length=1)
     chroma_port: int = Field(default=8000, ge=1, le=65535)
     chroma_host_port: int = Field(default=8001, ge=1, le=65535)
-    chroma_collection: str = Field(
+    chroma_collection_prefix: str = Field(
         default="contact-center-documents",
         min_length=3,
-        max_length=512,
+        max_length=128,
     )
 
     model_config = SettingsConfigDict(

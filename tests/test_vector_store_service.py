@@ -6,6 +6,7 @@ from app.schemas.document import TextChunkResponse
 from app.services.vector_store_service import (
     EmptyVectorStoreError,
     VectorStoreService,
+    build_collection_name,
 )
 
 
@@ -69,3 +70,19 @@ def test_empty_collection_cannot_be_queried() -> None:
 
     with pytest.raises(EmptyVectorStoreError):
         service.query([0.1, 0.2], 3)
+
+
+def test_collection_name_separates_provider_and_model() -> None:
+    local = build_collection_name(
+        "contact-center-documents",
+        "local",
+        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    )
+    openai = build_collection_name(
+        "contact-center-documents",
+        "openai",
+        "text-embedding-3-small",
+    )
+
+    assert local != openai
+    assert "/" not in local

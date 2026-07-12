@@ -16,6 +16,7 @@ class FakeRagService:
             update={
                 "indexed_chunks": document.total_chunks,
                 "collection": "test-collection",
+                "embedding_provider": "test",
                 "embedding_model": "test-embedding",
             }
         )

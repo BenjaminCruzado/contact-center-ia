@@ -28,6 +28,8 @@ class FakeSearchRagService:
             query=query,
             total_results=len(results),
             collection="test-collection",
+            embedding_provider="test",
+            embedding_model="test-embedding",
             results=results,
         )
 
@@ -36,6 +38,8 @@ class FakeSearchRagService:
             status="active",
             collection="test-collection",
             records=6,
+            embedding_provider="test",
+            embedding_model="test-embedding",
         )
 
 

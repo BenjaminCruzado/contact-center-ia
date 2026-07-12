@@ -1,34 +1,33 @@
-{
-  "validation_mode": "deterministic-vector-integration",
-  "note": "Valida el motor RAG y ChromaDB sin consumir OpenAI. La validación real del proveedor requiere OPENAI_API_KEY.",
-  "query": "¿Cómo conserva el sistema el contexto?",
+﻿{
+  "query": "¿Cómo procesa el sistema los documentos PDF?",
   "total_results": 3,
-  "collection": "contact-center-documents",
+  "collection": "contact-center-documents-local-sentence-transformers-paraphrase-multilingual-minilm-l12-v2",
+  "embedding_provider": "local",
+  "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
   "results": [
     {
       "position": 1,
-      "chunk_id": "documento-prueba-0001",
-      "document": "documento_prueba.pdf",
-      "similarity": 0.998792,
-      "similarity_percentage": 99.88,
-      "chunk_index": 0
-    },
-    {
-      "position": 2,
       "chunk_id": "documento-prueba-0002",
       "document": "documento_prueba.pdf",
-      "similarity": 0.994801,
-      "similarity_percentage": 99.48,
+      "similarity": 0.591017,
+      "similarity_percentage": 59.1,
       "chunk_index": 1
     },
     {
-      "position": 3,
-      "chunk_id": "documento-prueba-0003",
+      "position": 2,
+      "chunk_id": "documento-prueba-0004",
       "document": "documento_prueba.pdf",
-      "similarity": 0.981615,
-      "similarity_percentage": 98.16,
-      "chunk_index": 2
+      "similarity": 0.518589,
+      "similarity_percentage": 51.86,
+      "chunk_index": 3
+    },
+    {
+      "position": 3,
+      "chunk_id": "documento-prueba-0001",
+      "document": "documento_prueba.pdf",
+      "similarity": 0.499971,
+      "similarity_percentage": 50.0,
+      "chunk_index": 0
     }
   ]
 }
-

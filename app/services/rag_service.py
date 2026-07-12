@@ -7,8 +7,11 @@ from app.schemas.search import (
     SemanticSearchResult,
     VectorStoreStatusResponse,
 )
-from app.services.embedding_service import EmbeddingService
-from app.services.vector_store_service import VectorStoreService
+from app.services.embedding_service import EmbeddingService, get_embedding_service
+from app.services.vector_store_service import (
+    VectorStoreService,
+    build_collection_name,
+)
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -25,8 +28,15 @@ class RagService:
         app_settings: Settings = settings,
     ) -> None:
         self.settings = app_settings
-        self.embedding_service = embedding_service or EmbeddingService(app_settings)
-        self.vector_store = vector_store or VectorStoreService(app_settings)
+        self.embedding_service = embedding_service or get_embedding_service(app_settings)
+        self.vector_store = vector_store or VectorStoreService(
+            app_settings,
+            collection_name=build_collection_name(
+                app_settings.chroma_collection_prefix,
+                self.embedding_service.provider,
+                self.embedding_service.model,
+            ),
+        )
 
     def index_document(
         self,
@@ -44,6 +54,7 @@ class RagService:
             update={
                 "indexed_chunks": indexed_chunks,
                 "collection": self.vector_store.collection_name,
+                "embedding_provider": self.embedding_service.provider,
                 "embedding_model": self.embedding_service.model,
             }
         )
@@ -85,6 +96,8 @@ class RagService:
             query=query,
             total_results=len(results),
             collection=self.vector_store.collection_name,
+            embedding_provider=self.embedding_service.provider,
+            embedding_model=self.embedding_service.model,
             results=results,
         )
 
@@ -94,4 +107,6 @@ class RagService:
             status="active",
             collection=self.vector_store.collection_name,
             records=self.vector_store.count(),
+            embedding_provider=self.embedding_service.provider,
+            embedding_model=self.embedding_service.model,
         )
