@@ -7,12 +7,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = Field(default="Contact Center API", min_length=1)
-    app_version: str = Field(default="0.3.0", min_length=1)
+    app_version: str = Field(default="0.4.0", min_length=1)
     app_env: Literal["development", "testing", "production"] = "development"
     app_debug: bool = False
     app_host: str = "0.0.0.0"
     app_port: int = Field(default=8000, ge=1, le=65535)
     embedding_provider: Literal["local", "openai"] = "local"
+    llm_provider: Literal["mock", "openai"] = "mock"
     local_embedding_model: str = Field(
         default="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
         min_length=1,
@@ -28,8 +29,13 @@ class Settings(BaseSettings):
         default="text-embedding-3-small",
         min_length=1,
     )
+    openai_chat_model: str = Field(default="gpt-4o-mini", min_length=1)
     openai_timeout_seconds: float = Field(default=30.0, gt=0, le=120)
     openai_max_retries: int = Field(default=2, ge=0, le=5)
+    llm_timeout_seconds: float = Field(default=45.0, gt=0, le=180)
+    llm_max_retries: int = Field(default=2, ge=0, le=5)
+    rag_min_similarity: float = Field(default=0.45, ge=0, le=1)
+    rag_min_results: int = Field(default=1, ge=1, le=10)
     chroma_host: str = Field(default="chroma", min_length=1)
     chroma_port: int = Field(default=8000, ge=1, le=65535)
     chroma_host_port: int = Field(default=8001, ge=1, le=65535)

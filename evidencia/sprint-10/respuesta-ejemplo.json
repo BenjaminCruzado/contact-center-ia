@@ -1,0 +1,42 @@
+﻿{
+  "request": {
+    "query": "¿Qué hace el sistema con los documentos PDF?",
+    "top_k": 3
+  },
+  "response": {
+    "query": "¿Qué hace el sistema con los documentos PDF?",
+    "status": "answered",
+    "answer": "Según la documentación cargada, documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas.",
+    "collection": "contact-center-documents-local-sentence-transformers-paraphrase-multilingual-minilm-l12-v2",
+    "llm_provider": "mock",
+    "llm_model": "mock-rag-responder-v1",
+    "llm_invoked": true,
+    "total_sources": 3,
+    "sources": [
+      {
+        "position": 1,
+        "chunk_id": "documento-prueba-0002",
+        "document": "documento_prueba.pdf",
+        "similarity": 0.580762,
+        "similarity_percentage": 58.08,
+        "chunk_index": 1
+      },
+      {
+        "position": 2,
+        "chunk_id": "documento-prueba-0004",
+        "document": "documento_prueba.pdf",
+        "similarity": 0.519348,
+        "similarity_percentage": 51.93,
+        "chunk_index": 3
+      },
+      {
+        "position": 3,
+        "chunk_id": "documento-prueba-0001",
+        "document": "documento_prueba.pdf",
+        "similarity": 0.503531,
+        "similarity_percentage": 50.35,
+        "chunk_index": 0
+      }
+    ]
+  }
+}

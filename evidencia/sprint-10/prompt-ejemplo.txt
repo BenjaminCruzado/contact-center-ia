@@ -1,0 +1,22 @@
+﻿System prompt:
+Eres el orquestador del Contact Center interno. Responde únicamente con información presente en el contexto documental entregado. No inventes datos, no completes vacíos con conocimiento externo y no cites fuentes que no estén en el contexto. Si el contexto no permite responder con claridad, debes indicarlo explícitamente.
+
+User prompt:
+Consulta del usuario:
+¿Qué hace el sistema con los documentos PDF?
+
+Contexto recuperado:
+[Fuente 1] documento=documento_prueba.pdf chunk=documento-prueba-0002 similitud=58.08%
+documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para
+
+[Fuente 2] documento=documento_prueba.pdf chunk=documento-prueba-0004 similitud=51.93%
+conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF,
+
+[Fuente 3] documento=documento_prueba.pdf chunk=documento-prueba-0001 similitud=50.35%
+El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas. El sistema de Contact Center automatizado recibe documentos PDF, extrae texto plano, normaliza caracteres y
+
+Instrucciones de respuesta:
+1. Responde en español.
+2. Fundamenta la respuesta solo en el contexto recuperado.
+3. Si falta información, dilo de forma explícita.
+4. Mantén la respuesta clara y breve.

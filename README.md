@@ -3,7 +3,8 @@
 Base operativa del backend para el prototipo académico de Contact Center. Este
 proyecto incorpora ingesta de PDFs y recuperación semántica mediante embeddings
 locales u OpenAI, almacenados en ChromaDB. Todavía no incorpora generación
-final con LLM, STT, TTS ni telefonía.
+de audio ni telefonía, pero sí incorpora un orquestador textual con LLM mock u
+OpenAI para responder consultas basadas en la documentación interna.
 
 ## Requisitos
 
@@ -81,6 +82,42 @@ Cada proveedor y modelo usa una colección Chroma independiente para impedir que
 se mezclen vectores con dimensiones incompatibles. El archivo `.env` no se
 versiona.
 
+## Orquestación con LLM
+
+El Sprint 10 añade un endpoint que une recuperación semántica y respuesta final:
+
+```powershell
+$body = @{
+  query = "¿Qué hace el sistema con los documentos PDF?"
+  top_k = 3
+} | ConvertTo-Json
+
+Invoke-RestMethod `
+  -Method Post `
+  -Uri http://localhost:8000/orquestador/responder `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+Configuración por defecto del orquestador:
+
+```dotenv
+LLM_PROVIDER=mock
+RAG_MIN_SIMILARITY=0.45
+RAG_MIN_RESULTS=1
+```
+
+Si más adelante quieres usar OpenAI para la respuesta final:
+
+```dotenv
+LLM_PROVIDER=openai
+OPENAI_API_KEY=tu_clave_local
+OPENAI_CHAT_MODEL=gpt-4o-mini
+```
+
+Cuando la evidencia recuperada no supera el umbral configurado, el endpoint no
+inventa información y responde con un estado funcional `out_of_scope`.
+
 ## Operación
 
 ```powershell
@@ -116,3 +153,5 @@ app/
 
 Las evidencias de validación se organizan en `evidencia/sprint-07/`.
 Las evidencias de ingesta documental se organizan en `evidencia/sprint-08/`.
+Las evidencias del motor RAG se organizan en `evidencia/sprint-09/`.
+Las evidencias del orquestador se organizan en `evidencia/sprint-10/`.

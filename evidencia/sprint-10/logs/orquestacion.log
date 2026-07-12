@@ -1,0 +1,8 @@
+﻿Orquestación exitosa.
+Endpoint: POST /orquestador/responder
+Proveedor LLM: mock
+Modelo LLM: mock-rag-responder-v1
+Colección consultada: contact-center-documents-local-sentence-transformers-paraphrase-multilingual-minilm-l12-v2
+Fuentes utilizadas: 3
+Estado funcional: answered
+Respuesta fundamentada generada sin conocimiento externo.
