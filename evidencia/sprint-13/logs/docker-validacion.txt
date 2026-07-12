@@ -1,0 +1,14 @@
+$ docker compose ps
+NAME                      IMAGE                   COMMAND                  SERVICE    CREATED          STATUS                    PORTS
+contact-center-api        callcenter-api          "uvicorn app.main:ap…"   api        23 seconds ago   Up 17 seconds (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+contact-center-chroma     chromadb/chroma:1.5.9   "dumb-init -- chroma…"   chroma     2 weeks ago      Up 23 seconds (healthy)   0.0.0.0:8001->8000/tcp, [::]:8001->8000/tcp
+contact-center-frontend   nginx:1.27-alpine       "/docker-entrypoint.…"   frontend   5 hours ago      Up 11 seconds             0.0.0.0:3000->80/tcp, [::]:3000->80/tcp
+
+Validaciones HTTP:
+- GET http://localhost:8000/health -> 200 OK
+- POST http://localhost:8000/auth/login -> 200 OK (admin)
+- GET http://localhost:3000 -> 200 OK
+- POST http://localhost:8000/documentos/subir -> 200 OK
+- POST http://localhost:8000/documentos/buscar -> 200 OK
+- POST http://localhost:8000/orquestador/responder -> 200 OK
+- GET http://localhost:8000/auditoria/resumen -> 200 OK

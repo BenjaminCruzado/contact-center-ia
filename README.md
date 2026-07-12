@@ -251,4 +251,5 @@ Las evidencias del motor RAG se organizan en `evidencia/sprint-09/`.
 Las evidencias del orquestador se organizan en `evidencia/sprint-10/`.
 Las evidencias del flujo de voz se organizan en `evidencia/sprint-11/`.
 Las evidencias de auditoría se organizan en `evidencia/sprint-12/`.
-Las evidencias del frontend con roles se organizan en `evidencia/sprint-13/`.
+Las evidencias del frontend con roles se organizan en `evidencia/sprint-frontend/`.
+Las evidencias de pruebas integrales y validación E2E se organizan en `evidencia/sprint-13/`.

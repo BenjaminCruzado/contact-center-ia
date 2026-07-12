@@ -1,0 +1,1 @@
+{"document":"documento_prueba.pdf","pages":1,"extracted_characters":2351,"chunk_size":180,"chunk_overlap":30,"total_chunks":17,"indexed_chunks":17,"collection":"contact-center-documents-local-sentence-transformers-paraphrase-multilingual-minilm-l12-v2","embedding_provider":"local","embedding_model":"sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"}

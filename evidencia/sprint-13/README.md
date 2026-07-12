@@ -1,9 +1,12 @@
 # Evidencia Sprint 13
 
-Meta validada: existe un frontend web separado con login por roles, donde el usuario final interactúa por voz y el administrador gestiona documentos y auditoría.
+Meta validada: se ejecutaron pruebas integrales de caja negra y flujos
+completos de extremo a extremo sobre el sistema, tanto con `TestClient` como
+contra el stack real levantado con Docker.
 
-Archivos principales:
+Contenido principal:
 
-- `frontend-disponible.txt`: verificación del contenedor frontend en `http://localhost:3000`.
-- `login-ejemplo.json`: respuesta real del endpoint `/auth/login`.
-- `logs/pruebas.txt`: resultado de la suite automatizada del sprint.
+- `checklist-pruebas.md`: matriz resumida de escenarios cubiertos.
+- `logs/pruebas-integrales.txt`: resultados de las suites automatizadas.
+- `logs/docker-validacion.txt`: evidencia del entorno Docker levantado.
+- `resultados/*.json`: respuestas reales de endpoints clave validados en vivo.

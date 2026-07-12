@@ -1,0 +1,14 @@
+Prueba E2E consolidada:
+$ python -m pytest tests\test_e2e_system_flow.py -q
+..
+2 passed, 43 warnings in 1.80s
+
+Suite completa en host:
+$ python -m pytest -q
+................................................................
+64 passed, 44 warnings in 1.99s
+
+Suite completa dentro del contenedor api:
+$ docker exec contact-center-api python -m pytest -q
+................................................................
+64 passed in 13.74s
