@@ -96,6 +96,9 @@ class VectorStoreService:
                 "character_count": chunk.character_count,
                 "start_character": chunk.start_character,
                 "end_character": chunk.end_character,
+                "page_start": chunk.page_start,
+                "page_end": chunk.page_end,
+                "section_title": chunk.section_title or "",
             }
             for chunk in chunks
         ]

@@ -25,9 +25,9 @@ class FakeVectorStore:
             "ids": [["chunk-a", "chunk-b", "chunk-c"]],
             "documents": [["A", "B", "C"]],
             "metadatas": [[
-                {"document": "manual.pdf", "chunk_index": 0},
-                {"document": "manual.pdf", "chunk_index": 1},
-                {"document": "manual.pdf", "chunk_index": 2},
+                {"document": "manual.pdf", "chunk_index": 0, "page_start": 1, "page_end": 1, "section_title": "ARTÍCULO 1"},
+                {"document": "manual.pdf", "chunk_index": 1, "page_start": 1, "page_end": 1, "section_title": "ARTÍCULO 2"},
+                {"document": "manual.pdf", "chunk_index": 2, "page_start": 2, "page_end": 2, "section_title": "ARTÍCULO 3"},
             ]],
             "distances": [[0.08, 0.22, 0.41]],
         }
@@ -48,6 +48,9 @@ def sample_document() -> DocumentProcessingResponse:
             character_count=11,
             start_character=index * 10,
             end_character=index * 10 + 11,
+            page_start=1,
+            page_end=1,
+            section_title=f"ARTÍCULO {index + 1}",
         )
         for index in range(3)
     ]
@@ -88,6 +91,8 @@ def test_search_returns_top_three_ordered_scores() -> None:
         78.0,
         59.0,
     ]
+    assert result.results[1].section_title == "ARTÍCULO 2"
+    assert result.results[2].page_start == 2
 
 
 def test_distance_is_clamped_to_similarity_range() -> None:

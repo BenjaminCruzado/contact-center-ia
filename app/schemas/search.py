@@ -22,6 +22,9 @@ class SemanticSearchResult(BaseModel):
     similarity: float = Field(ge=0, le=1)
     similarity_percentage: float = Field(ge=0, le=100)
     chunk_index: int = Field(ge=0)
+    page_start: int | None = Field(default=None, ge=1)
+    page_end: int | None = Field(default=None, ge=1)
+    section_title: str | None = None
 
 
 class SemanticSearchResponse(BaseModel):

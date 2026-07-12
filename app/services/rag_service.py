@@ -82,14 +82,20 @@ class RagService:
                 similarity=round(similarity, 6),
                 similarity_percentage=round(similarity * 100, 2),
                 chunk_index=int(metadata.get("chunk_index", 0)),
+                page_start=_safe_positive_int(metadata.get("page_start")),
+                page_end=_safe_positive_int(metadata.get("page_end")),
+                section_title=_safe_optional_text(metadata.get("section_title")),
             )
             results.append(result)
             logger.info(
-                "Resultado semántico: posición=%s chunk=%s score=%.2f%% documento=%s",
+                "Resultado semántico: posición=%s chunk=%s score=%.2f%% documento=%s páginas=%s-%s sección=%s",
                 position,
                 chunk_id,
                 result.similarity_percentage,
                 result.document,
+                result.page_start,
+                result.page_end,
+                result.section_title or "N/A",
             )
 
         return SemanticSearchResponse(
@@ -110,3 +116,20 @@ class RagService:
             embedding_provider=self.embedding_service.provider,
             embedding_model=self.embedding_service.model,
         )
+
+
+def _safe_positive_int(value: object) -> int | None:
+    if value in (None, ""):
+        return None
+    try:
+        number = int(value)
+    except (TypeError, ValueError):
+        return None
+    return number if number > 0 else None
+
+
+def _safe_optional_text(value: object) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None

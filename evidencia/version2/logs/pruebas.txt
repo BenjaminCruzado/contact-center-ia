@@ -1,0 +1,5 @@
+python -m pytest tests/test_text_splitter.py tests/test_parser.py tests/test_rag_service.py tests/test_templates.py tests/test_vector_store_service.py tests/test_documentos.py tests/test_busqueda_documentos.py -q
+29 passed, 43 warnings in 1.67s
+
+python -m pytest -q
+69 passed, 44 warnings in 2.10s

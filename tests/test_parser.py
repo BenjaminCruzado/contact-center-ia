@@ -16,6 +16,9 @@ def test_extract_pdf_text_normalizes_content() -> None:
     assert result.pages_with_text == 1
     assert "Contact Center" in result.text
     assert result.character_count == len(result.text)
+    assert len(result.pages) == 1
+    assert result.pages[0].page_number == 1
+    assert result.pages[0].start_character == 0
 
 
 def test_rejects_invalid_pdf() -> None:

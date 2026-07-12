@@ -1,5 +1,3 @@
-from types import SimpleNamespace
-
 import pytest
 
 from app.schemas.document import TextChunkResponse
@@ -25,7 +23,7 @@ class FakeCollection:
         return {
             "ids": [["chunk-1"]],
             "documents": [["contenido"]],
-            "metadatas": [[{"document": "manual.pdf", "chunk_index": 0}]],
+            "metadatas": [[{"document": "manual.pdf", "chunk_index": 0, "page_start": 1, "page_end": 1, "section_title": "ARTÍCULO 1"}]],
             "distances": [[0.15]],
         }
 
@@ -51,6 +49,9 @@ def sample_chunk() -> TextChunkResponse:
         character_count=9,
         start_character=0,
         end_character=9,
+        page_start=1,
+        page_end=1,
+        section_title="ARTÍCULO 1",
     )
 
 
@@ -63,6 +64,7 @@ def test_upserts_chunks_with_cosine_collection() -> None:
     assert indexed == 1
     assert client.configuration == {"hnsw": {"space": "cosine"}}
     assert client.collection.records["ids"] == ["chunk-1"]
+    assert client.collection.records["metadatas"][0]["page_start"] == 1
 
 
 def test_empty_collection_cannot_be_queried() -> None:

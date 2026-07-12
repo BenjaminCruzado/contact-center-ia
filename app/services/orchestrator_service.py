@@ -43,6 +43,9 @@ class OrchestratorService:
                 similarity=result.similarity,
                 similarity_percentage=result.similarity_percentage,
                 chunk_index=result.chunk_index,
+                page_start=result.page_start,
+                page_end=result.page_end,
+                section_title=result.section_title,
             )
             for result in results
         ]

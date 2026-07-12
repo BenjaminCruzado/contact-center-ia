@@ -9,6 +9,7 @@ from fastapi import (
 )
 
 from app.api.deps import get_current_user, require_admin
+from app.config.settings import settings
 from app.schemas.document import DocumentProcessingResponse
 from app.schemas.search import (
     SemanticSearchRequest,
@@ -48,8 +49,8 @@ def get_rag_service() -> RagService:
 )
 async def upload_document(
     file: UploadFile = File(..., description="Documento PDF que se procesará en memoria."),
-    chunk_size: int = Query(default=500, ge=1, le=10_000),
-    chunk_overlap: int = Query(default=50, ge=0, le=9_999),
+    chunk_size: int = Query(default=settings.rag_default_chunk_size, ge=1, le=10_000),
+    chunk_overlap: int = Query(default=settings.rag_default_chunk_overlap, ge=0, le=9_999),
     _: object = Depends(require_admin),
     rag_service: RagService = Depends(get_rag_service),
 ) -> DocumentProcessingResponse:

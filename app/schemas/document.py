@@ -8,6 +8,9 @@ class TextChunkResponse(BaseModel):
     character_count: int = Field(ge=1)
     start_character: int = Field(ge=0)
     end_character: int = Field(ge=1)
+    page_start: int | None = Field(default=None, ge=1)
+    page_end: int | None = Field(default=None, ge=1)
+    section_title: str | None = None
 
 
 class DocumentProcessingResponse(BaseModel):

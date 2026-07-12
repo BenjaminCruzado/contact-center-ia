@@ -8,15 +8,18 @@ from app.prompts.templates import (
 from app.schemas.search import SemanticSearchResult
 
 
-def sample_result() -> SemanticSearchResult:
+def sample_result(position: int = 1, chunk_index: int = 0, content: str | None = None) -> SemanticSearchResult:
     return SemanticSearchResult(
-        position=1,
-        chunk_id="chunk-1",
+        position=position,
+        chunk_id=f"chunk-{position}",
         document="manual.pdf",
-        content="El sistema procesa documentos PDF y conserva contexto.",
+        content=content or "El sistema procesa documentos PDF y conserva contexto.",
         similarity=0.82,
         similarity_percentage=82.0,
-        chunk_index=0,
+        chunk_index=chunk_index,
+        page_start=1,
+        page_end=1,
+        section_title="ARTÍCULO 3",
     )
 
 
@@ -31,7 +34,21 @@ def test_format_context_blocks_contains_metadata() -> None:
     context = format_context_blocks([sample_result()])
 
     assert "documento=manual.pdf" in context
-    assert "similitud=82.00%" in context
+    assert "similitud_max=82.00%" in context
+    assert "paginas=1-1" in context
+
+
+def test_format_context_blocks_groups_adjacent_chunks() -> None:
+    context = format_context_blocks(
+        [
+            sample_result(position=1, chunk_index=10, content="Definición parte 1."),
+            sample_result(position=2, chunk_index=11, content="Definición parte 2."),
+        ]
+    )
+
+    assert context.count("[Fuente") == 1
+    assert "Definición parte 1." in context
+    assert "Definición parte 2." in context
 
 
 def test_build_user_prompt_injects_query_and_context() -> None:

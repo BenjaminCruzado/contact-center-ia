@@ -25,11 +25,20 @@ class EmptyDocumentError(PdfExtractionError):
 
 
 @dataclass(frozen=True)
+class ParsedPage:
+    page_number: int
+    text: str
+    start_character: int
+    end_character: int
+
+
+@dataclass(frozen=True)
 class ParsedDocument:
     text: str
     page_count: int
     pages_with_text: int
     character_count: int
+    pages: tuple[ParsedPage, ...]
 
 
 PdfSource = bytes | bytearray | str | Path | BinaryIO
@@ -66,14 +75,16 @@ def extract_pdf_text(source: PdfSource, document_name: str = "documento.pdf") ->
     if reader.is_encrypted:
         try:
             unlocked = reader.decrypt("")
-        except Exception as exc:  # pypdf puede propagar excepciones criptográficas.
+        except Exception as exc:
             raise PdfExtractionError("El PDF está cifrado y no puede procesarse.") from exc
         if not unlocked:
             raise PdfExtractionError("El PDF está cifrado y requiere contraseña.")
 
     page_texts: list[str] = []
+    parsed_pages: list[ParsedPage] = []
     pages_with_text = 0
     page_count = len(reader.pages)
+    cursor = 0
 
     for page_number, page in enumerate(reader.pages, start=1):
         try:
@@ -91,6 +102,17 @@ def extract_pdf_text(source: PdfSource, document_name: str = "documento.pdf") ->
         if clean_text:
             pages_with_text += 1
             page_texts.append(clean_text)
+            page_start = cursor
+            page_end = page_start + len(clean_text)
+            parsed_pages.append(
+                ParsedPage(
+                    page_number=page_number,
+                    text=clean_text,
+                    start_character=page_start,
+                    end_character=page_end,
+                )
+            )
+            cursor = page_end + 2
             logger.info(
                 "Página %s/%s extraída: %s caracteres",
                 page_number,
@@ -123,4 +145,5 @@ def extract_pdf_text(source: PdfSource, document_name: str = "documento.pdf") ->
         page_count=page_count,
         pages_with_text=pages_with_text,
         character_count=len(complete_text),
+        pages=tuple(parsed_pages),
     )
