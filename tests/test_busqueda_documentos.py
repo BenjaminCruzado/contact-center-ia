@@ -8,6 +8,7 @@ from app.schemas.search import (
     SemanticSearchResult,
     VectorStoreStatusResponse,
 )
+from tests.auth_helpers import make_auth_header
 
 
 class FakeSearchRagService:
@@ -57,6 +58,7 @@ def test_search_endpoint_returns_three_results() -> None:
     response = client.post(
         "/documentos/buscar",
         json={"query": "¿Cómo conserva contexto?", "top_k": 3},
+        headers=make_auth_header("user"),
     )
 
     assert response.status_code == 200
@@ -66,7 +68,10 @@ def test_search_endpoint_returns_three_results() -> None:
 
 
 def test_vector_store_status_endpoint() -> None:
-    response = client.get("/documentos/vector-store/status")
+    response = client.get(
+        "/documentos/vector-store/status",
+        headers=make_auth_header("admin"),
+    )
 
     assert response.status_code == 200
     assert response.json()["records"] == 6
@@ -76,6 +81,7 @@ def test_search_rejects_blank_query() -> None:
     response = client.post(
         "/documentos/buscar",
         json={"query": " ", "top_k": 3},
+        headers=make_auth_header("user"),
     )
 
     assert response.status_code == 422

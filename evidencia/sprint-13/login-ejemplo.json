@@ -1,0 +1,7 @@
+{
+  "access_token": "generado-dinamicamente-en-validacion-local",
+  "token_type": "bearer",
+  "role": "user",
+  "username": "usuario",
+  "expires_in_seconds": 28800
+}

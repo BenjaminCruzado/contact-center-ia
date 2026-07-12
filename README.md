@@ -4,6 +4,7 @@ Base operativa del backend para el prototipo académico de Contact Center. Este
 proyecto incorpora ingesta de PDFs, recuperación semántica mediante embeddings
 locales u OpenAI, un orquestador textual y un flujo de voz por archivo de audio
 que transcribe, consulta el núcleo RAG y devuelve una respuesta sintetizada.
+Desde Sprint 13 también incorpora un frontend web con login por roles.
 
 ## Requisitos
 
@@ -34,6 +35,9 @@ que transcribe, consulta el núcleo RAG y devuelve una respuesta sintetizada.
 
 La documentación interactiva queda disponible en
 `http://localhost:8000/docs`.
+
+Frontend web disponible en:
+`http://localhost:3000`
 
 ## Procesar un PDF
 
@@ -154,6 +158,43 @@ TTS_VOICE=es-la
 Para pruebas rápidas también existe un modo `mock`, útil en tests y entornos
 sin descarga de modelos.
 
+## Frontend web con roles
+
+El Sprint 13 agrega un cliente web separado con dos perfiles:
+
+- Usuario final:
+  - inicia sesión
+  - graba audio desde el navegador
+  - envía la consulta
+  - recibe respuesta textual
+  - escucha automáticamente el audio de respuesta
+
+- Administrador:
+  - inicia sesión
+  - sube PDFs para el RAG
+  - consulta auditoría, logs y métricas
+  - no entra al panel conversacional del usuario
+
+Decisión funcional del prototipo:
+
+- hay login
+- no hay registro público
+- las cuentas están predefinidas en configuración
+
+Credenciales por defecto de desarrollo:
+
+```dotenv
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
+NORMAL_USERNAME=usuario
+NORMAL_PASSWORD=user123
+```
+
+Endpoints nuevos de autenticación:
+
+- `POST /auth/login`
+- `GET /auth/me`
+
 ## Auditoría y trazabilidad
 
 El Sprint 12 agrega un módulo de auditoría persistente en SQLite para registrar
@@ -210,3 +251,4 @@ Las evidencias del motor RAG se organizan en `evidencia/sprint-09/`.
 Las evidencias del orquestador se organizan en `evidencia/sprint-10/`.
 Las evidencias del flujo de voz se organizan en `evidencia/sprint-11/`.
 Las evidencias de auditoría se organizan en `evidencia/sprint-12/`.
+Las evidencias del frontend con roles se organizan en `evidencia/sprint-13/`.

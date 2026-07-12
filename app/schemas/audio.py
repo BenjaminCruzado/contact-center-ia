@@ -14,6 +14,8 @@ class AudioInteractionMetadata(BaseModel):
     llm_model: str
     status: str
     audio_size_bytes: int = Field(ge=1)
+    transcript_base64: str | None = None
+    answer_base64: str | None = None
 
 
 class AudioInteractionDebugResponse(AudioInteractionMetadata):

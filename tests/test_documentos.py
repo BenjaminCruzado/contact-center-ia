@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from app.api.routers.documentos import get_rag_service
 from app.main import app
 from app.schemas.document import DocumentProcessingResponse
+from tests.auth_helpers import make_auth_header
 from tests.pdf_factory import create_text_pdf
 
 
@@ -40,6 +41,7 @@ def test_upload_pdf_returns_structured_chunks() -> None:
     response = client.post(
         "/documentos/subir?chunk_size=180&chunk_overlap=30",
         files={"file": ("manual.pdf", create_text_pdf(text), "application/pdf")},
+        headers=make_auth_header("admin"),
     )
 
     assert response.status_code == 200
@@ -58,6 +60,7 @@ def test_rejects_non_pdf_upload() -> None:
     response = client.post(
         "/documentos/subir",
         files={"file": ("notas.txt", b"texto", "text/plain")},
+        headers=make_auth_header("admin"),
     )
 
     assert response.status_code == 415
@@ -67,7 +70,17 @@ def test_rejects_overlap_equal_to_chunk_size() -> None:
     response = client.post(
         "/documentos/subir?chunk_size=100&chunk_overlap=100",
         files={"file": ("manual.pdf", create_text_pdf("Texto"), "application/pdf")},
+        headers=make_auth_header("admin"),
     )
 
     assert response.status_code == 422
 
+
+def test_upload_requires_admin_role() -> None:
+    response = client.post(
+        "/documentos/subir",
+        files={"file": ("manual.pdf", create_text_pdf("Texto"), "application/pdf")},
+        headers=make_auth_header("user"),
+    )
+
+    assert response.status_code == 403

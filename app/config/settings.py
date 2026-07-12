@@ -7,15 +7,22 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = Field(default="Contact Center API", min_length=1)
-    app_version: str = Field(default="0.6.0", min_length=1)
+    app_version: str = Field(default="0.7.0", min_length=1)
     app_env: Literal["development", "testing", "production"] = "development"
     app_debug: bool = False
     app_host: str = "0.0.0.0"
     app_port: int = Field(default=8000, ge=1, le=65535)
+    frontend_url: str = Field(default="http://localhost:3000", min_length=1)
     embedding_provider: Literal["local", "openai"] = "local"
     llm_provider: Literal["mock", "openai"] = "mock"
     stt_provider: Literal["mock", "local"] = "local"
     tts_provider: Literal["mock", "local"] = "local"
+    auth_secret_key: str = Field(default="contact-center-dev-secret", min_length=16)
+    auth_token_expire_minutes: int = Field(default=480, ge=15, le=10_080)
+    admin_username: str = Field(default="admin", min_length=3)
+    admin_password: str = Field(default="admin123", min_length=4)
+    normal_username: str = Field(default="usuario", min_length=3)
+    normal_password: str = Field(default="user123", min_length=4)
     local_embedding_model: str = Field(
         default="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
         min_length=1,

@@ -8,6 +8,7 @@ from app.schemas.orchestrator import (
     OrchestratorSource,
     OrchestratorTrace,
 )
+from tests.auth_helpers import make_auth_header
 
 
 class FakeOrchestratorService:
@@ -80,6 +81,7 @@ def test_orchestrator_endpoint_returns_answer() -> None:
     response = client.post(
         "/orquestador/responder",
         json={"query": "¿Qué hace el sistema?", "top_k": 3},
+        headers=make_auth_header("user"),
     )
 
     assert response.status_code == 200
@@ -95,6 +97,7 @@ def test_orchestrator_endpoint_returns_out_of_scope() -> None:
     response = client.post(
         "/orquestador/responder",
         json={"query": "Tema ajeno al manual", "top_k": 3},
+        headers=make_auth_header("user"),
     )
 
     assert response.status_code == 200
@@ -108,6 +111,19 @@ def test_orchestrator_endpoint_rejects_blank_query() -> None:
     response = client.post(
         "/orquestador/responder",
         json={"query": " ", "top_k": 3},
+        headers=make_auth_header("user"),
     )
 
     assert response.status_code == 422
+
+
+def test_orchestrator_endpoint_requires_user_role() -> None:
+    app.dependency_overrides[get_orchestrator_service] = FakeOrchestratorService
+
+    response = client.post(
+        "/orquestador/responder",
+        json={"query": "¿Qué hace el sistema?", "top_k": 3},
+        headers=make_auth_header("admin"),
+    )
+
+    assert response.status_code == 403

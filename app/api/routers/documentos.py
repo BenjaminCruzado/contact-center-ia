@@ -8,6 +8,7 @@ from fastapi import (
     status,
 )
 
+from app.api.deps import get_current_user, require_admin
 from app.schemas.document import DocumentProcessingResponse
 from app.schemas.search import (
     SemanticSearchRequest,
@@ -49,6 +50,7 @@ async def upload_document(
     file: UploadFile = File(..., description="Documento PDF que se procesará en memoria."),
     chunk_size: int = Query(default=500, ge=1, le=10_000),
     chunk_overlap: int = Query(default=50, ge=0, le=9_999),
+    _: object = Depends(require_admin),
     rag_service: RagService = Depends(get_rag_service),
 ) -> DocumentProcessingResponse:
     filename = file.filename or "documento.pdf"
@@ -123,6 +125,7 @@ async def upload_document(
 )
 async def search_documents(
     request: SemanticSearchRequest,
+    _: object = Depends(get_current_user),
     rag_service: RagService = Depends(get_rag_service),
 ) -> SemanticSearchResponse:
     try:
@@ -155,6 +158,7 @@ async def search_documents(
     status_code=status.HTTP_200_OK,
 )
 async def vector_store_status(
+    _: object = Depends(require_admin),
     rag_service: RagService = Depends(get_rag_service),
 ) -> VectorStoreStatusResponse:
     try:
@@ -164,4 +168,3 @@ async def vector_store_status(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(exc),
         ) from exc
-

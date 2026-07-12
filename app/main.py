@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.config.settings import settings
@@ -14,6 +15,23 @@ def create_application() -> FastAPI:
         description="Core API del prototipo de Contact Center automatizado.",
     )
     AuditService().initialize()
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=[settings.frontend_url],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=[
+            "X-Request-Id",
+            "X-Process-Time-Ms",
+            "X-Transcript",
+            "X-Voice-Status",
+            "X-LLM-Provider",
+            "X-Voice-Latency-Ms",
+            "X-Transcript-B64",
+            "X-Answer-B64",
+        ],
+    )
     application.add_middleware(AuditMiddleware)
     application.include_router(api_router)
     return application

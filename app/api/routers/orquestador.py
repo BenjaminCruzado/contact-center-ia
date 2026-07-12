@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
+from app.api.deps import require_user
 from app.schemas.orchestrator import OrchestratorRequest, OrchestratorResponse
 from app.services.audit_service import AuditService
 from app.services.embedding_service import (
@@ -28,6 +29,7 @@ def get_orchestrator_service() -> OrchestratorService:
 async def answer_query(
     request_context: Request,
     request: OrchestratorRequest,
+    _: object = Depends(require_user),
     orchestrator_service: OrchestratorService = Depends(get_orchestrator_service),
 ) -> OrchestratorResponse:
     audit_service = AuditService()

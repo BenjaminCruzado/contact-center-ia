@@ -1,0 +1,10 @@
+Frontend validado localmente en:
+- http://localhost:3000
+
+Resultado HTTP:
+- 200 OK
+
+Fragmento devuelto:
+- <!doctype html>
+- <html lang="es">
+- <head>

@@ -1,5 +1,6 @@
 import logging
 import time
+from base64 import b64encode
 from dataclasses import dataclass
 
 from app.config.settings import Settings, settings
@@ -30,6 +31,8 @@ class VoiceInteractionResult:
     latency_rag_ms: float
     latency_llm_ms: float
     latency_tts_ms: float
+    transcript_base64: str
+    answer_base64: str
 
 
 class VoiceOrchestratorService:
@@ -101,6 +104,8 @@ class VoiceOrchestratorService:
             latency_rag_ms=orchestrated_trace.rag_latency_ms,
             latency_llm_ms=orchestrated_trace.llm_latency_ms,
             latency_tts_ms=round(latency_tts_ms, 2),
+            transcript_base64=b64encode(transcript.encode("utf-8")).decode("ascii"),
+            answer_base64=b64encode(orchestrated.answer.encode("utf-8")).decode("ascii"),
         )
 
     def build_debug_response(
@@ -122,6 +127,8 @@ class VoiceOrchestratorService:
             llm_model=result.llm_model,
             status=result.status,
             audio_size_bytes=len(result.audio_bytes),
+            transcript_base64=result.transcript_base64,
+            answer_base64=result.answer_base64,
             total_sources=result.total_sources,
             confidence_label=result.confidence_label,
             top_score=result.top_score,

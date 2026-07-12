@@ -11,6 +11,7 @@ from fastapi import (
 )
 from fastapi.responses import StreamingResponse
 
+from app.api.deps import require_user
 from app.config.settings import settings
 from app.schemas.audio import AudioInteractionDebugResponse
 from app.services.audit_service import AuditService
@@ -118,6 +119,7 @@ async def interact_with_voice(
     file: UploadFile = File(..., description="Audio grabado por el usuario."),
     top_k: int = Query(default=3, ge=1, le=10),
     transcript_hint: str | None = Form(default=None),
+    _: object = Depends(require_user),
     voice_service: VoiceOrchestratorService = Depends(get_voice_orchestrator_service),
 ) -> StreamingResponse:
     audit_service = AuditService()
@@ -141,6 +143,9 @@ async def interact_with_voice(
         )
         raise _handle_voice_error(exc) from exc
 
+    stt_provider = getattr(getattr(voice_service, "stt_service", None), "provider", "unknown")
+    tts_provider = getattr(getattr(voice_service, "tts_service", None), "provider", "unknown")
+
     audit_service.enrich_request(
         request_context,
         interaction_type="voice",
@@ -159,8 +164,8 @@ async def interact_with_voice(
             "input_content_type": content_type,
             "output_filename": result.output_filename,
             "output_content_type": result.output_content_type,
-            "stt_provider": voice_service.stt_service.provider,
-            "tts_provider": voice_service.tts_service.provider,
+            "stt_provider": stt_provider,
+            "tts_provider": tts_provider,
             "llm_provider": result.llm_provider,
             "llm_model": result.llm_model,
         },
@@ -171,6 +176,8 @@ async def interact_with_voice(
         "X-Voice-Status": result.status,
         "X-LLM-Provider": result.llm_provider,
         "X-Voice-Latency-Ms": f"{result.latency_total_ms:.2f}",
+        "X-Transcript-B64": result.transcript_base64,
+        "X-Answer-B64": result.answer_base64,
     }
     return StreamingResponse(
         iter([result.audio_bytes]),
@@ -189,6 +196,7 @@ async def interact_with_voice_debug(
     file: UploadFile = File(..., description="Audio grabado por el usuario."),
     top_k: int = Query(default=3, ge=1, le=10),
     transcript_hint: str | None = Form(default=None),
+    _: object = Depends(require_user),
     voice_service: VoiceOrchestratorService = Depends(get_voice_orchestrator_service),
 ) -> AudioInteractionDebugResponse:
     audit_service = AuditService()
@@ -202,6 +210,8 @@ async def interact_with_voice_debug(
             top_k=top_k,
             transcript_hint=transcript_hint,
         )
+        stt_provider = getattr(getattr(voice_service, "stt_service", None), "provider", "unknown")
+        tts_provider = getattr(getattr(voice_service, "tts_service", None), "provider", "unknown")
         audit_service.enrich_request(
             request_context,
             interaction_type="voice",
@@ -220,8 +230,8 @@ async def interact_with_voice_debug(
                 "input_content_type": content_type,
                 "output_filename": result.output_filename,
                 "output_content_type": result.output_content_type,
-                "stt_provider": voice_service.stt_service.provider,
-                "tts_provider": voice_service.tts_service.provider,
+                "stt_provider": stt_provider,
+                "tts_provider": tts_provider,
                 "llm_provider": result.llm_provider,
                 "llm_model": result.llm_model,
             },
