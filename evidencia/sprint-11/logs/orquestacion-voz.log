@@ -1,0 +1,9 @@
+﻿Audio Entrada -> STT -> LLM -> Texto -> Audio Salida
+
+INFO: Audio transcrito: proveedor=local texto=Como concerla el contexto entre conzultas
+INFO: Resultado semántico: posición=1 chunk=documento-prueba-0006 score=50.86% documento=documento_prueba.pdf
+INFO: Resultado semántico: posición=2 chunk=documento-prueba-0003 score=47.43% documento=documento_prueba.pdf
+INFO: Respuesta mock generada: consulta=Como concerla el contexto entre conzultas fragmentos=1
+INFO: Orquestación completada: consulta=Como concerla el contexto entre conzultas proveedor_llm=mock fuentes=2
+INFO: Audio sintetizado: proveedor=local voz=es-la bytes=428024
+INFO: Flujo de voz completado: audio_entrada=audio-entrada-2.wav texto=Como concerla el contexto entre conzultas proveedor_stt=local proveedor_tts=local estado=answered

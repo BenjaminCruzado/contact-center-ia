@@ -1,0 +1,49 @@
+﻿# STT local
+class LocalWhisperSttService:
+    provider = "local"
+
+    def transcribe(
+        self,
+        audio_bytes: bytes,
+        filename: str,
+        content_type: str,
+        transcript_hint: str | None = None,
+    ) -> str:
+        del transcript_hint, content_type
+        suffix = Path(filename).suffix or ".wav"
+        temp_path = ""
+        try:
+            with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as temp_file:
+                temp_file.write(audio_bytes)
+                temp_path = temp_file.name
+            result = self._get_model().transcribe(
+                temp_path,
+                language=self.settings.whisper_language,
+                fp16=False,
+                verbose=False,
+            )
+            transcript = _normalize_transcript(str(result.get("text", "")))
+
+# TTS local
+class LocalEspeakTtsService:
+    provider = "local"
+    output_content_type = "audio/wav"
+
+    def synthesize(self, text: str) -> bytes:
+        clean_text = " ".join(text.split()).strip()
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
+            output_path = temp_file.name
+        result = subprocess.run(
+            [
+                "espeak-ng",
+                "-v",
+                self.settings.tts_voice,
+                "-w",
+                output_path,
+                clean_text,
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        audio_bytes = Path(output_path).read_bytes()

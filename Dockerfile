@@ -13,6 +13,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends ffmpeg espeak-ng \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN addgroup --system appgroup \
     && adduser --system --home /home/appuser --ingroup appgroup appuser \
     && mkdir -p /home/appuser /models/sentence-transformers /models/.cache/huggingface \

@@ -1,0 +1,15 @@
+﻿{
+  "input_filename": "audio-entrada.wav",
+  "input_content_type": "audio/wav",
+  "output_filename": "audio-respuesta.wav",
+  "output_content_type": "audio/wav",
+  "transcript": "Como concerla el contexto entre conzultas",
+  "answer": "Según la documentación cargada, extrae texto plano, normaliza caracteres y divide el contenido en fragmentos solapados para conservar el contexto entre consultas.",
+  "stt_provider": "local",
+  "tts_provider": "local",
+  "llm_provider": "mock",
+  "llm_model": "mock-rag-responder-v1",
+  "status": "answered",
+  "audio_size_bytes": 428024,
+  "total_sources": 2
+}

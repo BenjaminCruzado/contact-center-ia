@@ -1,10 +1,9 @@
 # Contact Center automatizado con IA
 
 Base operativa del backend para el prototipo académico de Contact Center. Este
-proyecto incorpora ingesta de PDFs y recuperación semántica mediante embeddings
-locales u OpenAI, almacenados en ChromaDB. Todavía no incorpora generación
-de audio ni telefonía, pero sí incorpora un orquestador textual con LLM mock u
-OpenAI para responder consultas basadas en la documentación interna.
+proyecto incorpora ingesta de PDFs, recuperación semántica mediante embeddings
+locales u OpenAI, un orquestador textual y un flujo de voz por archivo de audio
+que transcribe, consulta el núcleo RAG y devuelve una respuesta sintetizada.
 
 ## Requisitos
 
@@ -118,6 +117,43 @@ OPENAI_CHAT_MODEL=gpt-4o-mini
 Cuando la evidencia recuperada no supera el umbral configurado, el endpoint no
 inventa información y responde con un estado funcional `out_of_scope`.
 
+## Interacción por voz
+
+El Sprint 11 añade un flujo de audio de extremo a extremo. El cliente puede
+grabar en navegador y enviar el archivo al terminar la captura:
+
+```powershell
+curl.exe -X POST ^
+  "http://localhost:8000/voz/interactuar-debug?top_k=3" ^
+  -H "accept: application/json" ^
+  -H "Content-Type: multipart/form-data" ^
+  -F "file=@ruta/al/audio.wav;type=audio/wav"
+```
+
+La respuesta de depuración incluye la transcripción, la respuesta textual y los
+metadatos del audio generado. El endpoint principal devuelve audio reproducible:
+
+```powershell
+curl.exe -X POST ^
+  "http://localhost:8000/voz/interactuar?top_k=3" ^
+  -H "accept: audio/wav" ^
+  -H "Content-Type: multipart/form-data" ^
+  -F "file=@ruta/al/audio.wav;type=audio/wav" ^
+  --output respuesta.wav
+```
+
+Configuración local recomendada:
+
+```dotenv
+STT_PROVIDER=local
+TTS_PROVIDER=local
+WHISPER_MODEL=tiny
+TTS_VOICE=es-la
+```
+
+Para pruebas rápidas también existe un modo `mock`, útil en tests y entornos
+sin descarga de modelos.
+
 ## Operación
 
 ```powershell
@@ -155,3 +191,4 @@ Las evidencias de validación se organizan en `evidencia/sprint-07/`.
 Las evidencias de ingesta documental se organizan en `evidencia/sprint-08/`.
 Las evidencias del motor RAG se organizan en `evidencia/sprint-09/`.
 Las evidencias del orquestador se organizan en `evidencia/sprint-10/`.
+Las evidencias del flujo de voz se organizan en `evidencia/sprint-11/`.
