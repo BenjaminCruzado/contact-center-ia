@@ -8,24 +8,35 @@ Desde Sprint 13 también incorpora un frontend web con login por roles.
 
 ## Requisitos
 
+- Git
 - Docker Desktop con Docker Compose
-- Puerto `8000` disponible
+- Puertos `3000`, `8000`, `8001` y `11434` disponibles
+- Conexión a internet durante el primer inicio para descargar imágenes y modelos
+
+No es necesario instalar Python, Node.js, ChromaDB, Whisper ni Ollama en la
+máquina host. Docker Compose administra el stack completo.
 
 ## Inicio rápido
 
-1. Crear el archivo local de configuración:
+1. Clonar el repositorio y entrar a su carpeta.
+
+2. Crear el archivo local de configuración:
 
    ```powershell
    Copy-Item .env.example .env
    ```
 
-2. Construir y levantar la API:
+3. Construir y levantar el sistema completo:
 
    ```powershell
-   docker compose up --build -d
+   docker compose up --build --wait
    ```
 
-3. Consultar el estado:
+La primera ejecución descarga `llama3.2:3b`, los embeddings multilingües y el
+modelo de Whisper. Puede tardar varios minutos según la conexión y el equipo.
+Las siguientes ejecuciones reutilizan los volúmenes persistentes.
+
+4. Consultar el estado:
 
    ```powershell
    Invoke-RestMethod http://localhost:8000/health
@@ -38,6 +49,16 @@ La documentación interactiva queda disponible en
 
 Frontend web disponible en:
 `http://localhost:3000`
+
+Servicios incluidos en el stack:
+
+- frontend web con Nginx
+- API FastAPI
+- ChromaDB
+- Ollama con descarga automática del modelo
+- embeddings y Whisper locales
+- síntesis de voz local
+- auditoría SQLite persistente
 
 ## Procesar un PDF
 
@@ -105,22 +126,21 @@ Invoke-RestMethod `
 Configuración por defecto del orquestador:
 
 ```dotenv
-LLM_PROVIDER=mock
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://ollama:11434/api
+OLLAMA_MODEL=llama3.2:3b
 RAG_MIN_SIMILARITY=0.45
 RAG_MIN_RESULTS=1
 ```
 
-Si quieres usar un LLM local real sin pagar API, puedes cambiar a Ollama:
+Ollama se ejecuta dentro de Docker. El servicio `ollama-init` descarga el modelo
+configurado antes de iniciar la API, y el volumen `ollama-models` evita repetir
+la descarga en cada reinicio. Desde la máquina host, la API de Ollama queda
+disponible en `http://localhost:11434/api`.
 
-```dotenv
-LLM_PROVIDER=ollama
-OLLAMA_BASE_URL=http://host.docker.internal:11434/api
-OLLAMA_MODEL=llama3.1
-```
-
-Debes tener Ollama ejecutándose en tu máquina host y haber descargado el modelo
-elegido. La API local oficial de Ollama expone por defecto
-`http://localhost:11434/api`.
+Para cambiar de modelo, modifica `OLLAMA_MODEL` en `.env` y vuelve a ejecutar
+`docker compose up --build --wait`. Compose descargará el nuevo modelo antes de
+iniciar la API.
 
 Si más adelante quieres usar OpenAI para la respuesta final:
 
@@ -168,7 +188,7 @@ TTS_VOICE=es-la
 ```
 
 Para pruebas rápidas también existe un modo `mock`, útil en tests y entornos
-sin descarga de modelos. Para demos con IA local real, se recomienda combinar:
+automatizados. La ejecución normal utiliza IA local real con:
 
 ```dotenv
 EMBEDDING_PROVIDER=local
@@ -234,23 +254,80 @@ Endpoints disponibles:
 ## Operación
 
 ```powershell
-# Ver logs
-docker compose logs -f api
+# Ver logs de todo el stack
+docker compose logs -f
+
+# Ver solamente API y Ollama
+docker compose logs -f api ollama ollama-init
 
 # Revisar contenedores y healthcheck
 docker compose ps
 
+# Ver los modelos instalados
+docker compose exec ollama ollama list
+
+# Reiniciar sin borrar datos ni modelos
+docker compose restart
+
 # Detener el entorno
 docker compose down
+
+# Detener y eliminar todos los datos y modelos persistentes
+docker compose down --volumes
 ```
 
-## Producción
+## Aceleración NVIDIA opcional
 
-El `Dockerfile` contiene un target `production`, sin recarga automática:
+La configuración predeterminada usa CPU para maximizar compatibilidad. En un
+equipo con GPU NVIDIA compatible, Docker Desktop con backend WSL2 y NVIDIA
+Container Toolkit configurado, se puede iniciar con:
 
 ```powershell
-docker build --target production -t contact-center-api:0.1.0 .
-docker run --rm -p 8000:8000 --env-file .env contact-center-api:0.1.0
+docker compose -f docker-compose.yml -f docker-compose.gpu.yml up --build --wait
+```
+
+El archivo `docker-compose.gpu.yml` asigna las GPU disponibles solamente al
+servicio Ollama. Si Docker no reconoce la GPU, utiliza el comando normal sin el
+archivo adicional.
+
+## Solución de problemas
+
+### Docker Desktop no está iniciado
+
+Si aparece un error de conexión al daemon, inicia Docker Desktop, espera a que
+el motor Linux esté disponible y vuelve a ejecutar `docker compose up`.
+
+### La descarga del modelo falla
+
+Revisa el inicializador:
+
+```powershell
+docker compose logs ollama-init
+docker compose run --rm ollama-init
+```
+
+### Ollama no responde
+
+```powershell
+docker compose ps ollama
+docker compose logs ollama
+Invoke-RestMethod http://localhost:11434/api/tags
+```
+
+### Un puerto ya está ocupado
+
+Los puertos publicados se pueden cambiar en `.env` mediante `APP_PORT`,
+`CHROMA_HOST_PORT` y `OLLAMA_HOST_PORT`. Para cambiar el frontend, ajusta el
+mapeo del servicio `frontend` en `docker-compose.yml`.
+
+## Imagen de producción
+
+El servicio `api` utiliza el target `production` del `Dockerfile`, sin recarga
+automática. Para reconstruirlo junto con sus dependencias:
+
+```powershell
+docker compose build api
+docker compose up --wait
 ```
 
 ## Estructura

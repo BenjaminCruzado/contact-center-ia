@@ -10,6 +10,9 @@ services:
     environment:
       APP_HOST: 0.0.0.0
       APP_PORT: 8000
+      LLM_PROVIDER: ollama
+      OLLAMA_BASE_URL: http://ollama:11434/api
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
       CHROMA_HOST: chroma
       CHROMA_PORT: 8000
       HOME: /home/appuser
@@ -22,6 +25,10 @@ services:
     depends_on:
       chroma:
         condition: service_healthy
+      ollama:
+        condition: service_healthy
+      ollama-init:
+        condition: service_completed_successfully
     ports:
       - "${APP_PORT:-8000}:8000"
     volumes:
@@ -37,9 +44,36 @@ services:
           "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)",
         ]
       interval: 10s
-      timeout: 3s
-      retries: 3
-      start_period: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 180s
+
+  ollama:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    container_name: contact-center-ollama
+    ports:
+      - "${OLLAMA_HOST_PORT:-11434}:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  ollama-init:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    container_name: contact-center-ollama-init
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["/bin/ollama"]
+    command: ["pull", "${OLLAMA_MODEL:-llama3.2:3b}"]
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
 
   chroma:
     image: chromadb/chroma:1.5.9
@@ -79,3 +113,4 @@ volumes:
   chroma-data:
   embedding-models:
   audit-data:
+  ollama-models:
